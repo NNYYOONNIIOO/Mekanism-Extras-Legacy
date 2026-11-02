@@ -144,11 +144,11 @@ public class TileEntityExtraOrganicFarm extends TileEntityMachine implements IEx
     private boolean recipeCachesInvalid;
 
     public TileEntityExtraOrganicFarm(ExtraMachineTier tier) {
-        super("injection", "TierOrganicFarm", tier.processes * MachineType.ORGANIC_FARM.getStorage(),
+        super("injection", "TierOrganicFarm", tier.getProcesses() * MachineType.ORGANIC_FARM.getStorage(),
               MachineType.ORGANIC_FARM.getUsage(), 3);
         this.tier = tier;
         setSupportedUpgrade(com.jerry.mekextras.common.registries.ExtraUpgrades.CREATIVE);
-        this.threadCount = tier.processes;
+        this.threadCount = tier.getProcesses();
         inputSlots = new InputInventorySlot[threadCount];
         progress = new int[threadCount];
         usedSoFar = new long[threadCount];

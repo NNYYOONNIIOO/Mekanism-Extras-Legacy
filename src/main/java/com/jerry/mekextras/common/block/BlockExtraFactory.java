@@ -42,6 +42,7 @@ public class BlockExtraFactory extends BlockExtraMachine {
             case COSMIC:
                 return MachineType.ELITE_FACTORY;
             case INFINITE:
+            case LUNA:
                 return MachineType.ULTIMATE_FACTORY;
             case ABSOLUTE:
             default:

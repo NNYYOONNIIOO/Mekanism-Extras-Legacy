@@ -17,7 +17,9 @@
     },
     "P": {
       "item": "mekceumoremachine:TierChemicalWasher",
-      "data": 3
+      "nbt": {
+        "tier": 3
+      }
     }
   },
   "result": {

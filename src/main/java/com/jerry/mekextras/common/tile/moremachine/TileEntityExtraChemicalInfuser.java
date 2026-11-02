@@ -140,21 +140,21 @@ public class TileEntityExtraChemicalInfuser extends TileEntityBasicMachine<Chemi
 
     private ResizableGasTank getOrCreateLeftTank(IContentsListener listener) {
         if (leftTank == null) {
-            leftTank = ResizableGasTank.input(MAX_GAS * tier.processes, this::isValidLeftGas, getRecipeCacheListener());
+            leftTank = ResizableGasTank.input(MAX_GAS * tier.getProcesses(), this::isValidLeftGas, getRecipeCacheListener());
         }
         return leftTank;
     }
 
     private ResizableGasTank getOrCreateRightTank(IContentsListener listener) {
         if (rightTank == null) {
-            rightTank = ResizableGasTank.input(MAX_GAS * tier.processes, this::isValidRightGas, getRecipeCacheListener());
+            rightTank = ResizableGasTank.input(MAX_GAS * tier.getProcesses(), this::isValidRightGas, getRecipeCacheListener());
         }
         return rightTank;
     }
 
     private ResizableGasTank getOrCreateCenterTank(IContentsListener listener) {
         if (centerTank == null) {
-            centerTank = ResizableGasTank.output(MAX_GAS * tier.processes, getRecipeCacheChangeListener(listener));
+            centerTank = ResizableGasTank.output(MAX_GAS * tier.getProcesses(), getRecipeCacheChangeListener(listener));
         }
         return centerTank;
     }
@@ -185,7 +185,7 @@ public class TileEntityExtraChemicalInfuser extends TileEntityBasicMachine<Chemi
 
     public int getUpgradedUsage(ChemicalInfuserRecipe recipe) {
         int possibleProcess = Math.min((int) Math.pow(2, upgradeComponent.getUpgrades(Upgrade.SPEED)), MekanismConfig.current().mekce.MAXspeedmachines.val());
-        possibleProcess *= tier.processes;
+        possibleProcess *= tier.getProcesses();
         return Math.max(possibleProcess, 1);
     }
 
@@ -279,9 +279,9 @@ public class TileEntityExtraChemicalInfuser extends TileEntityBasicMachine<Chemi
             ExtraMachineTier prevTier = tier;
             tier = ExtraMachineTier.byIndex(dataStream.readInt());
             sorting = dataStream.readBoolean();
-            leftTank.setMaxGas(tier.processes * MAX_GAS);
-            rightTank.setMaxGas(tier.processes * MAX_GAS);
-            centerTank.setMaxGas(tier.processes * MAX_GAS);
+            leftTank.setMaxGas(tier.getProcesses() * MAX_GAS);
+            rightTank.setMaxGas(tier.getProcesses() * MAX_GAS);
+            centerTank.setMaxGas(tier.getProcesses() * MAX_GAS);
             clientEnergyUsed = dataStream.readDouble();
             TileUtils.readTankData(dataStream, leftTank);
             TileUtils.readTankData(dataStream, rightTank);
@@ -308,9 +308,9 @@ public class TileEntityExtraChemicalInfuser extends TileEntityBasicMachine<Chemi
         securityComponent.read(nbtTags);
         tier = ExtraMachineTier.byIndex(nbtTags.getInteger("tier"));
         sorting = nbtTags.getBoolean("sorting");
-        leftTank.setMaxGas(tier.processes * MAX_GAS);
-        rightTank.setMaxGas(tier.processes * MAX_GAS);
-        centerTank.setMaxGas(tier.processes * MAX_GAS);
+        leftTank.setMaxGas(tier.getProcesses() * MAX_GAS);
+        rightTank.setMaxGas(tier.getProcesses() * MAX_GAS);
+        centerTank.setMaxGas(tier.getProcesses() * MAX_GAS);
         leftTank.read(nbtTags.getCompoundTag("leftTank"));
         rightTank.read(nbtTags.getCompoundTag("rightTank"));
         centerTank.read(nbtTags.getCompoundTag("centerTank"));
@@ -365,9 +365,9 @@ public class TileEntityExtraChemicalInfuser extends TileEntityBasicMachine<Chemi
             return false;
         }
         tier = ExtraMachineTier.ABSOLUTE;
-        leftTank.setMaxGas(tier.processes * MAX_GAS);
-        rightTank.setMaxGas(tier.processes * MAX_GAS);
-        centerTank.setMaxGas(tier.processes * MAX_GAS);
+        leftTank.setMaxGas(tier.getProcesses() * MAX_GAS);
+        rightTank.setMaxGas(tier.getProcesses() * MAX_GAS);
+        centerTank.setMaxGas(tier.getProcesses() * MAX_GAS);
         upgradeComponent.getSupportedTypes().forEach(this::recalculateUpgradables);
         Mekanism.packetHandler.sendUpdatePacket(this);
         markNoUpdateSync();
@@ -396,7 +396,7 @@ public class TileEntityExtraChemicalInfuser extends TileEntityBasicMachine<Chemi
     }
 
     public double getTierEnergy() {
-        return BlockStateMachine.MachineType.CHEMICAL_INFUSER.getStorage() * tier.processes;
+        return BlockStateMachine.MachineType.CHEMICAL_INFUSER.getStorage() * tier.getProcesses();
     }
 
     public boolean isUpgrade = true;

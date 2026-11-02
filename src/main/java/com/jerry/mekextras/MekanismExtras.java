@@ -5,6 +5,7 @@ import com.jerry.mekextras.common.CommonProxy;
 import com.jerry.mekextras.common.CreativeTabExtra;
 import com.jerry.mekextras.common.ExtraGuiHandler;
 import com.jerry.mekextras.common.config.ExtraConfig;
+import com.jerry.mekextras.common.command.CommandExtraConfig;
 import com.jerry.mekextras.common.registries.ExtraBlocks;
 import com.jerry.mekextras.common.registries.ExtraFluids;
 import com.jerry.mekextras.common.registries.ExtraItems;
@@ -30,6 +31,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Logger;
@@ -47,7 +49,7 @@ public class MekanismExtras implements IModule {
 
     public static final String MODID = "mekanism_extras";
     public static final String NAME = "Mekanism Extras Legacy";
-    public static final String VERSION = "1.0.0";
+    public static final String VERSION = "1.1.0";
 
     @SidedProxy(clientSide = "com.jerry.mekextras.client.ClientProxy", serverSide = "com.jerry.mekextras.common.CommonProxy")
     public static CommonProxy proxy;
@@ -55,7 +57,7 @@ public class MekanismExtras implements IModule {
     @Mod.Instance(MekanismExtras.MODID)
     public static MekanismExtras instance;
 
-    public static Version versionNumber = new Version(1, 0, 0);
+    public static Version versionNumber = new Version(1, 1, 0);
 
     public static CreativeTabExtra tabExtra = new CreativeTabExtra();
 
@@ -76,6 +78,18 @@ public class MekanismExtras implements IModule {
     public static void registerItems(RegistryEvent.Register<Item> event) {
         ExtraItems.registerItems(event.getRegistry());
         ExtraBlocks.registerItemBlocks(event.getRegistry());
+    }
+
+    @SubscribeEvent
+    public static void remapItems(RegistryEvent.MissingMappings<Item> event) {
+        for (RegistryEvent.MissingMappings.Mapping<Item> mapping : event.getMappings()) {
+            switch (mapping.key.getPath()) {
+                case "alloy_alloy_thermonuclear": mapping.remap(ExtraItems.THERMONUCLEAR_ALLOY); break;
+                case "alloy_alloy_shining": mapping.remap(ExtraItems.SHINING_ALLOY); break;
+                case "alloy_alloy_spectrum": mapping.remap(ExtraItems.SPECTRUM_ALLOY); break;
+                default: break;
+            }
+        }
     }
 
     @SubscribeEvent
@@ -125,10 +139,16 @@ public class MekanismExtras implements IModule {
         proxy.postInit();
     }
 
+    @Mod.EventHandler
+    public void serverStarting(FMLServerStartingEvent event) {
+        event.registerServerCommand(new CommandExtraConfig());
+    }
+
     @SubscribeEvent
     public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
         if (event.getModID().equals(MODID) || event.getModID().equals(Mekanism.MODID)) {
             ExtraConfig.sync();
+            ExtraConfig.reloadTierConfigAfterConfigChange();
         }
     }
 

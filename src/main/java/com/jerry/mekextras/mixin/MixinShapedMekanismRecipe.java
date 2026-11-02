@@ -34,7 +34,8 @@ public class MixinShapedMekanismRecipe {
         inherited.removeTag("tier");
         inherited.removeTag("extraTier");
         result.setTagCompound(inherited);
-        AdvancedTier tier = AdvancedTier.byIndex(ItemBlockExtraMachine.getDefaultTier(((ItemBlockExtraMachine) result.getItem()).getBlock()));
+        AdvancedTier tier = AdvancedTier.byIndex(ItemBlockExtraMachine.getDefaultTier(
+              ((ItemBlockExtraMachine) result.getItem()).getBlock()));
         ExtraUtils.setTierOnStack(result, tier);
         callback.setReturnValue(result);
     }

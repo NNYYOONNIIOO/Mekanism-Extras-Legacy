@@ -136,11 +136,11 @@ public class TileEntityExtraCrystallizer extends TileEntityMachine implements IE
               MachineType.CHEMICAL_CRYSTALLIZER.getUsage(), 3);
         tier = type;
         setSupportedUpgrade(com.jerry.mekextras.common.registries.ExtraUpgrades.CREATIVE);
-        progress = new int[tier.processes];
-        cachedRecipe = new CrystallizerRecipe[tier.processes];
-        activeProcesses = new boolean[tier.processes];
+        progress = new int[tier.getProcesses()];
+        cachedRecipe = new CrystallizerRecipe[getProcessCount()];
+        activeProcesses = new boolean[getProcessCount()];
         recipeCacheLookupMonitors = createRecipeCacheLookupMonitors();
-        inputTanks = new ResizableGasTank[tier.processes];
+        inputTanks = new ResizableGasTank[getProcessCount()];
         isActive = false;
         upgradeComponent.getSupportedTypes().forEach(this::recalculateUpgradables);
 
@@ -161,8 +161,8 @@ public class TileEntityExtraCrystallizer extends TileEntityMachine implements IE
 
     @SuppressWarnings("unchecked")
     private FactoryRecipeCacheLookupMonitor<CrystallizerRecipe>[] createRecipeCacheLookupMonitors() {
-        FactoryRecipeCacheLookupMonitor<CrystallizerRecipe>[] monitors = new FactoryRecipeCacheLookupMonitor[tier.processes];
-        for (int process = 0; process < tier.processes; process++) {
+        FactoryRecipeCacheLookupMonitor<CrystallizerRecipe>[] monitors = new FactoryRecipeCacheLookupMonitor[getProcessCount()];
+        for (int process = 0; process < getProcessCount(); process++) {
             monitors[process] = new FactoryRecipeCacheLookupMonitor<>(this, process, this::markSortingNeeded);
         }
         return monitors;
@@ -191,7 +191,7 @@ public class TileEntityExtraCrystallizer extends TileEntityMachine implements IE
         InventorySlotHelper builder = createInventorySlotHelper();
         outputSlots.clear();
         energySlot = builder.addSlot(EnergyInventorySlot.fillOrConvert(getMainEnergyContainer(), this::getWorld, listener, 8, 13));
-        for (int process = 0; process < tier.processes; process++) {
+        for (int process = 0; process < getProcessCount(); process++) {
             int processIndex = process;
             OutputInventorySlot outputSlot = builder.addSlot(OutputInventorySlot.at(getOutputSlotListener(listener, process), getProcessSlotX(process), 71));
             outputSlot.setEnabledSupplier(() -> isProcessIndex(processIndex));
@@ -231,6 +231,9 @@ public class TileEntityExtraCrystallizer extends TileEntityMachine implements IE
     }
 
     private ResizableGasTank getOrCreateInputTank(int process, IContentsListener listener) {
+        if (process < 0 || process >= inputTanks.length) {
+            throw new IllegalArgumentException("Invalid process " + process);
+        }
         ResizableGasTank tank = switch (process) {
             case 0 -> inputTank1 == null ? inputTank1 = ResizableGasTank.input(MAX_GAS, this::isValidGas, getInputTankListener(listener, process)) : inputTank1;
             case 1 -> inputTank2 == null ? inputTank2 = ResizableGasTank.input(MAX_GAS, this::isValidGas, getInputTankListener(listener, process)) : inputTank2;
@@ -249,7 +252,8 @@ public class TileEntityExtraCrystallizer extends TileEntityMachine implements IE
             case 14 -> inputTank15 == null ? inputTank15 = ResizableGasTank.input(MAX_GAS, this::isValidGas, getInputTankListener(listener, process)) : inputTank15;
             case 15 -> inputTank16 == null ? inputTank16 = ResizableGasTank.input(MAX_GAS, this::isValidGas, getInputTankListener(listener, process)) : inputTank16;
             case 16 -> inputTank17 == null ? inputTank17 = ResizableGasTank.input(MAX_GAS, this::isValidGas, getInputTankListener(listener, process)) : inputTank17;
-            default -> throw new IllegalArgumentException("Invalid process " + process);
+            default -> inputTanks[process] == null
+                  ? ResizableGasTank.input(MAX_GAS, this::isValidGas, getInputTankListener(listener, process)) : inputTanks[process];
         };
         inputTanks[process] = tank;
         return tank;
@@ -270,7 +274,7 @@ public class TileEntityExtraCrystallizer extends TileEntityMachine implements IE
 
     @Override
     public int getGasSorterProcessCount() {
-        return tier.processes;
+        return getProcessCount();
     }
 
     @Override
@@ -335,8 +339,8 @@ public class TileEntityExtraCrystallizer extends TileEntityMachine implements IE
     }
 
     private List<IExtendedGasTank> getInputTanks() {
-        List<IExtendedGasTank> tanks = new ArrayList<>(tier.processes);
-        for (int process = 0; process < tier.processes; process++) {
+        List<IExtendedGasTank> tanks = new ArrayList<>(getProcessCount());
+        for (int process = 0; process < getProcessCount(); process++) {
             tanks.add(inputTanks[process]);
         }
         return tanks;
@@ -392,7 +396,7 @@ public class TileEntityExtraCrystallizer extends TileEntityMachine implements IE
             markSortingNotNeeded();
             sortInputGasTanks();
         }
-        for (int process = 0; process < tier.processes; process++) {
+        for (int process = 0; process < getProcessCount(); process++) {
             if (!recipeCacheLookupMonitors[process].updateAndProcess()) {
                 progress[process] = 0;
                 activeProcesses[process] = false;
@@ -444,7 +448,7 @@ public class TileEntityExtraCrystallizer extends TileEntityMachine implements IE
     }
 
     private boolean hasInputGas() {
-        for (int process = 0; process < tier.processes; process++) {
+        for (int process = 0; process < getProcessCount(); process++) {
             ResizableGasTank inputTank = inputTanks[process];
             GasStack stack = inputTank == null ? null : inputTank.getGas();
             if (stack != null && stack.amount > 0) {
@@ -488,7 +492,11 @@ public class TileEntityExtraCrystallizer extends TileEntityMachine implements IE
     }
 
     private boolean isProcessIndex(int process) {
-        return process >= 0 && process < tier.processes;
+        return process >= 0 && process < getProcessCount();
+    }
+
+    private int getProcessCount() {
+        return progress == null ? tier.getProcesses() : progress.length;
     }
 
     private void setProcessActive(int process, boolean active) {
@@ -600,7 +608,7 @@ public class TileEntityExtraCrystallizer extends TileEntityMachine implements IE
         if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
             sorting = dataStream.readBoolean();
             upgraded = dataStream.readBoolean();
-            for (int i = 0; i < tier.processes; i++) {
+            for (int i = 0; i < getProcessCount(); i++) {
                 progress[i] = dataStream.readInt();
             }
             for (GasTank inputTank : inputTanks) {
@@ -631,7 +639,7 @@ public class TileEntityExtraCrystallizer extends TileEntityMachine implements IE
     public void readCustomNBT(NBTTagCompound nbtTags) {
         super.readCustomNBT(nbtTags);
         sorting = nbtTags.getBoolean("sorting");
-        for (int i = 0; i < tier.processes; i++) {
+        for (int i = 0; i < getProcessCount(); i++) {
             progress[i] = nbtTags.getInteger("progress" + i);
         }
         for (int i = 0; i < inputTanks.length; i++) {
@@ -643,7 +651,7 @@ public class TileEntityExtraCrystallizer extends TileEntityMachine implements IE
     public void writeCustomNBT(NBTTagCompound nbtTags) {
         super.writeCustomNBT(nbtTags);
         nbtTags.setBoolean("sorting", sorting);
-        for (int i = 0; i < tier.processes; i++) {
+        for (int i = 0; i < getProcessCount(); i++) {
             nbtTags.setInteger("progress" + i, progress[i]);
         }
         for (int i = 0; i < inputTanks.length; i++) {
@@ -718,8 +726,8 @@ public class TileEntityExtraCrystallizer extends TileEntityMachine implements IE
 
     @Override
     public Object[] getManagedTanks() {
-        Object[] tanks = new Object[tier.processes];
-        System.arraycopy(inputTanks, 0, tanks, 0, tier.processes);
+        Object[] tanks = new Object[getProcessCount()];
+        System.arraycopy(inputTanks, 0, tanks, 0, getProcessCount());
         return tanks;
     }
 
@@ -761,7 +769,7 @@ public class TileEntityExtraCrystallizer extends TileEntityMachine implements IE
     public int getRedstoneLevel() {
         int stored = 0;
         int capacity = 0;
-        for (int process = 0; process < tier.processes; process++) {
+        for (int process = 0; process < getProcessCount(); process++) {
             stored += inputTanks[process].getStored();
             capacity += inputTanks[process].getMaxGas();
         }

@@ -2,6 +2,7 @@ package com.jerry.mekextras.common.tier;
 
 import com.jerry.mekextras.api.tier.AdvancedTier;
 import com.jerry.mekextras.api.tier.IAdvancedTier;
+import com.jerry.mekextras.common.config.ExtraConfig;
 import mekanism.common.tier.BaseTier;
 import mekanism.common.tier.GasTankTier;
 
@@ -16,7 +17,8 @@ public enum ExtraMachineTier implements IAdvancedTier {
     ABSOLUTE(AdvancedTier.ABSOLUTE, 11),
     SUPREME(AdvancedTier.SUPREME, 13),
     COSMIC(AdvancedTier.COSMIC, 15),
-    INFINITE(AdvancedTier.INFINITE, 17);
+    INFINITE(AdvancedTier.INFINITE, 17),
+    LUNA(AdvancedTier.LUNA, 21);
 
     public final int processes;
     private final AdvancedTier advancedTier;
@@ -33,6 +35,10 @@ public enum ExtraMachineTier implements IAdvancedTier {
     public int ticksRequired(int baseTicks) {
         double factor = 1 - 0.25 * ordinal();
         return Math.max(1, (int) Math.round(baseTicks * factor));
+    }
+
+    public int getProcesses() {
+        return ExtraConfig.getInt(advancedTier, "extraMachineProcesses", processes);
     }
 
     public GasTankTier getGasTankTier() {
@@ -60,6 +66,7 @@ public enum ExtraMachineTier implements IAdvancedTier {
             case COSMIC:
                 return "elite";
             case INFINITE:
+            case LUNA:
                 return "ultimate";
             default:
                 return "basic";

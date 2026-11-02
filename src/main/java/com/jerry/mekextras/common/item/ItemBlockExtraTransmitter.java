@@ -3,6 +3,7 @@ package com.jerry.mekextras.common.item;
 import com.jerry.mekextras.MekanismExtras;
 import com.jerry.mekextras.api.tier.AdvancedTier;
 import com.jerry.mekextras.common.block.BlockExtraTransmitter;
+import com.jerry.mekextras.common.config.ExtraConfig;
 import com.jerry.mekextras.common.tier.ExtraCableTier;
 import com.jerry.mekextras.common.tier.ExtraConductorTier;
 import com.jerry.mekextras.common.tier.ExtraPipeTier;
@@ -63,8 +64,9 @@ public class ItemBlockExtraTransmitter extends ItemBlock implements IOverlayRend
         } else {
             return false;
         }
-        ResourceLocation icon = new ResourceLocation(MekanismExtras.MODID, "gui/icons/" +
-              iconType.toLowerCase(Locale.ROOT) + "_mask.png");
+        String configured = ExtraConfig.getTexture(transmitter.getExtraTier(), "icon",
+              "mekanism_extras:gui/icons/" + iconType.toLowerCase(Locale.ROOT) + "_mask.png");
+        ResourceLocation icon = new ResourceLocation(configured);
         float ticks = MekanismClient.ticksPassed + Minecraft.getMinecraft().getRenderPartialTicks();
         int color = transmitter.getExtraTier().getDisplayColor(ticks);
         GlStateManager.pushMatrix();

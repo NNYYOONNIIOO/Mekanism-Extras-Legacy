@@ -19,6 +19,7 @@ import com.jerry.mekextras.common.block.BlockExtraWasteBarrel;
 import com.jerry.mekextras.common.block.BlockExtraOre;
 import com.jerry.mekextras.common.block.BlockExtraResource;
 import com.jerry.mekextras.common.block.ExtraWorldGenerator;
+import com.jerry.mekextras.common.config.ExtraConfig;
 import com.jerry.mekextras.common.item.ItemBlockExtraBin;
 import com.jerry.mekextras.common.item.ItemBlockExtraMachine;
 import com.jerry.mekextras.common.item.ItemBlockExtraTransmitter;
@@ -60,7 +61,9 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.EnumMap;
+import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.Locale;
 
 public class ExtraBlocks {
 
@@ -118,7 +121,7 @@ public class ExtraBlocks {
             for (ExtraFactoryTier tier : ExtraFactoryTier.values()) {
                 Block block = new BlockExtraFactory(tier, type);
                 tiers[tier.ordinal()] = block;
-                init(block, tier.getName() + "_" + type.name().toLowerCase(java.util.Locale.ROOT) + "_factory");
+                init(block, tier.getName() + "_" + type.name().toLowerCase(Locale.ROOT) + "_factory");
             }
             FACTORIES.put(type, tiers);
         }
@@ -149,7 +152,7 @@ public class ExtraBlocks {
             for (AdvancedTier tier : AdvancedTier.values()) {
                 Block block = new BlockExtraTransmitter(type, tier);
                 tiers[tier.ordinal()] = block;
-                init(block, tier.getLowerName() + "_" + type.getName());
+                init(block, configuredBlockName(tier, tier.getLowerName() + "_" + type.getName()));
             }
             TRANSMITTERS.put(type, tiers);
         }
@@ -173,7 +176,7 @@ public class ExtraBlocks {
         for (ExtraMachineTier tier : ExtraMachineTier.values()) {
             Block block = new BlockExtraMoreMachine(tier, factory, guiId);
             tiers[tier.ordinal()] = block;
-            init(block, tier.getAdvanceTier().getLowerName() + "_" + name);
+            init(block, configuredBlockName(tier.getAdvanceTier(), tier.getAdvanceTier().getLowerName() + "_" + name));
         }
         MORE_MACHINES.put(name, tiers);
         return tiers;
@@ -189,36 +192,75 @@ public class ExtraBlocks {
         return block;
     }
 
+    private static String configuredBlockName(AdvancedTier tier, String fallback) {
+        String fallbackType = blockType(fallback);
+        String configured = ExtraConfig.getBlockId(tier, fallbackType);
+        if (configured == null && !fallbackType.equals(fallback)) {
+            configured = ExtraConfig.getBlockId(tier, "transmitter_" + fallbackType);
+        }
+        return configured == null ? fallback : stripNamespace(configured);
+    }
+
+    private static String blockType(String fallback) {
+        int separator = fallback.indexOf('_');
+        return separator < 0 ? fallback : fallback.substring(separator + 1);
+    }
+
+    private static String stripNamespace(String name) {
+        int separator = name.indexOf(':');
+        return separator < 0 ? name : name.substring(separator + 1);
+    }
+
+    private static void registerTiered(IForgeRegistry<Block> registry, Block block, String type) {
+        AdvancedTier tier = blockTier(block);
+        if (tier == null) {
+            throw new IllegalArgumentException("Tiered block has no Extra tier: " + block);
+        }
+        registry.register(init(block, configuredBlockName(tier, tier.getLowerName() + "_" + type)));
+    }
+
+    @Nullable
+    private static AdvancedTier blockTier(Block block) {
+        if (block instanceof BlockExtraBin bin) return bin.getTier().getAdvanceTier();
+        if (block instanceof BlockExtraEnergyCube cube) return cube.getTier().getAdvanceTier();
+        if (block instanceof BlockExtraFluidTank tank) return tank.getTier().getAdvanceTier();
+        if (block instanceof BlockExtraChemicalTank tank) return tank.getTier().getAdvanceTier();
+        if (block instanceof BlockExtraWasteBarrel barrel) return barrel.getTier().getAdvanceTier();
+        if (block instanceof BlockExtraInductionCell cell) return cell.getTier().getAdvanceTier();
+        if (block instanceof BlockExtraInductionProvider provider) return provider.getTier().getAdvanceTier();
+        return null;
+    }
+
     public static void registerBlocks(IForgeRegistry<Block> registry) {
         registry.register(init(NAQUADAH_ORE, "naquadah_ore"));
         registry.register(init(END_NAQUADAH_ORE, "end_naquadah_ore"));
         registry.register(init(NAQUADAH_BLOCK, "block_naquadah"));
         registry.register(init(RAW_NAQUADAH_BLOCK, "block_raw_naquadah"));
 
-        registry.register(init(ABSOLUTE_BIN, "absolute_bin"));
-        registry.register(init(SUPREME_BIN, "supreme_bin"));
-        registry.register(init(COSMIC_BIN, "cosmic_bin"));
-        registry.register(init(INFINITE_BIN, "infinite_bin"));
+        registerTiered(registry, ABSOLUTE_BIN, "bin");
+        registerTiered(registry, SUPREME_BIN, "bin");
+        registerTiered(registry, COSMIC_BIN, "bin");
+        registerTiered(registry, INFINITE_BIN, "bin");
 
-        registry.register(init(ABSOLUTE_ENERGY_CUBE, "absolute_energy_cube"));
-        registry.register(init(SUPREME_ENERGY_CUBE, "supreme_energy_cube"));
-        registry.register(init(COSMIC_ENERGY_CUBE, "cosmic_energy_cube"));
-        registry.register(init(INFINITE_ENERGY_CUBE, "infinite_energy_cube"));
+        registerTiered(registry, ABSOLUTE_ENERGY_CUBE, "energy_cube");
+        registerTiered(registry, SUPREME_ENERGY_CUBE, "energy_cube");
+        registerTiered(registry, COSMIC_ENERGY_CUBE, "energy_cube");
+        registerTiered(registry, INFINITE_ENERGY_CUBE, "energy_cube");
 
-        registry.register(init(ABSOLUTE_FLUID_TANK, "absolute_fluid_tank"));
-        registry.register(init(SUPREME_FLUID_TANK, "supreme_fluid_tank"));
-        registry.register(init(COSMIC_FLUID_TANK, "cosmic_fluid_tank"));
-        registry.register(init(INFINITE_FLUID_TANK, "infinite_fluid_tank"));
+        registerTiered(registry, ABSOLUTE_FLUID_TANK, "fluid_tank");
+        registerTiered(registry, SUPREME_FLUID_TANK, "fluid_tank");
+        registerTiered(registry, COSMIC_FLUID_TANK, "fluid_tank");
+        registerTiered(registry, INFINITE_FLUID_TANK, "fluid_tank");
 
-        registry.register(init(ABSOLUTE_CHEMICAL_TANK, "absolute_chemical_tank"));
-        registry.register(init(SUPREME_CHEMICAL_TANK, "supreme_chemical_tank"));
-        registry.register(init(COSMIC_CHEMICAL_TANK, "cosmic_chemical_tank"));
-        registry.register(init(INFINITE_CHEMICAL_TANK, "infinite_chemical_tank"));
+        registerTiered(registry, ABSOLUTE_CHEMICAL_TANK, "chemical_tank");
+        registerTiered(registry, SUPREME_CHEMICAL_TANK, "chemical_tank");
+        registerTiered(registry, COSMIC_CHEMICAL_TANK, "chemical_tank");
+        registerTiered(registry, INFINITE_CHEMICAL_TANK, "chemical_tank");
 
-        registry.register(init(ABSOLUTE_RADIOACTIVE_WASTE_BARREL, "absolute_radioactive_waste_barrel"));
-        registry.register(init(SUPREME_RADIOACTIVE_WASTE_BARREL, "supreme_radioactive_waste_barrel"));
-        registry.register(init(COSMIC_RADIOACTIVE_WASTE_BARREL, "cosmic_radioactive_waste_barrel"));
-        registry.register(init(INFINITE_RADIOACTIVE_WASTE_BARREL, "infinite_radioactive_waste_barrel"));
+        registerTiered(registry, ABSOLUTE_RADIOACTIVE_WASTE_BARREL, "radioactive_waste_barrel");
+        registerTiered(registry, SUPREME_RADIOACTIVE_WASTE_BARREL, "radioactive_waste_barrel");
+        registerTiered(registry, COSMIC_RADIOACTIVE_WASTE_BARREL, "radioactive_waste_barrel");
+        registerTiered(registry, INFINITE_RADIOACTIVE_WASTE_BARREL, "radioactive_waste_barrel");
 
         registry.register(init(NAQUADAH_REACTOR_CASING, "naquadah_reactor_casing"));
         registry.register(init(NAQUADAH_REACTOR_PORT, "naquadah_reactor_port"));
@@ -228,14 +270,14 @@ public class ExtraBlocks {
         registry.register(init(ADVANCED_ELECTRIC_PUMP, "advanced_electric_pump"));
         registry.register(init(REINFORCED_INDUCTION_CASING, "reinforced_induction_casing"));
         registry.register(init(REINFORCED_INDUCTION_PORT, "reinforced_induction_port"));
-        registry.register(init(ABSOLUTE_INDUCTION_CELL, "absolute_induction_cell"));
-        registry.register(init(SUPREME_INDUCTION_CELL, "supreme_induction_cell"));
-        registry.register(init(COSMIC_INDUCTION_CELL, "cosmic_induction_cell"));
-        registry.register(init(INFINITE_INDUCTION_CELL, "infinite_induction_cell"));
-        registry.register(init(ABSOLUTE_INDUCTION_PROVIDER, "absolute_induction_provider"));
-        registry.register(init(SUPREME_INDUCTION_PROVIDER, "supreme_induction_provider"));
-        registry.register(init(COSMIC_INDUCTION_PROVIDER, "cosmic_induction_provider"));
-        registry.register(init(INFINITE_INDUCTION_PROVIDER, "infinite_induction_provider"));
+        registerTiered(registry, ABSOLUTE_INDUCTION_CELL, "induction_cell");
+        registerTiered(registry, SUPREME_INDUCTION_CELL, "induction_cell");
+        registerTiered(registry, COSMIC_INDUCTION_CELL, "induction_cell");
+        registerTiered(registry, INFINITE_INDUCTION_CELL, "induction_cell");
+        registerTiered(registry, ABSOLUTE_INDUCTION_PROVIDER, "induction_provider");
+        registerTiered(registry, SUPREME_INDUCTION_PROVIDER, "induction_provider");
+        registerTiered(registry, COSMIC_INDUCTION_PROVIDER, "induction_provider");
+        registerTiered(registry, INFINITE_INDUCTION_PROVIDER, "induction_provider");
         for (Block[] tiers : FACTORIES.values()) {
             for (Block block : tiers) {
                 registry.register(block);

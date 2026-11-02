@@ -117,12 +117,12 @@ public class TileEntityExtraNutritionalLiquifier extends TileEntityMachine imple
         super("oxidizer", "TierNutritionalLiquifier", type.processes * MachineType.NUTRITIONAL_LIQUIFIER.getStorage(), MachineType.NUTRITIONAL_LIQUIFIER.getUsage(), 1);
         this.tier = type;
         setSupportedUpgrade(com.jerry.mekextras.common.registries.ExtraUpgrades.CREATIVE);
-        progress = new int[tier.processes];
+        progress = new int[tier.getProcesses()];
         isActive = false;
-        cachedRecipe = new NutritionalRecipe[tier.processes];
-        activeProcesses = new boolean[tier.processes];
+        cachedRecipe = new NutritionalRecipe[getProcessCount()];
+        activeProcesses = new boolean[getProcessCount()];
         recipeCacheLookupMonitors = createRecipeCacheLookupMonitors();
-        outPutTanks = new ResizableGasTank[tier.processes];
+        outPutTanks = new ResizableGasTank[getProcessCount()];
         upgradeComponent.getSupportedTypes().forEach(this::recalculateUpgradables);
 
         configComponent = new TileComponentConfig(this, TransmissionType.ITEM, TransmissionType.GAS, TransmissionType.ENERGY);
@@ -145,8 +145,8 @@ public class TileEntityExtraNutritionalLiquifier extends TileEntityMachine imple
 
     @SuppressWarnings("unchecked")
     private RecipeCacheLookupMonitor<NutritionalRecipe>[] createRecipeCacheLookupMonitors() {
-        RecipeCacheLookupMonitor<NutritionalRecipe>[] monitors = new RecipeCacheLookupMonitor[tier.processes];
-        for (int process = 0; process < tier.processes; process++) {
+        RecipeCacheLookupMonitor<NutritionalRecipe>[] monitors = new RecipeCacheLookupMonitor[getProcessCount()];
+        for (int process = 0; process < getProcessCount(); process++) {
             monitors[process] = new RecipeCacheLookupMonitor<>(this, process);
         }
         return monitors;
@@ -176,7 +176,7 @@ public class TileEntityExtraNutritionalLiquifier extends TileEntityMachine imple
         InventorySlotHelper builder = createInventorySlotHelper();
         inputSlots.clear();
         energySlot = builder.addSlot(EnergyInventorySlot.fillOrConvert(getMainEnergyContainer(), this::getWorld, listener, 8, 13));
-        for (int process = 0; process < tier.processes; process++) {
+        for (int process = 0; process < getProcessCount(); process++) {
             int processIndex = process;
             // Hidden process slots remain persisted, but must not accept automation input.
             InputInventorySlot inputSlot = builder.addSlot(InputInventorySlot.at(stack -> isProcessIndex(processIndex),
@@ -219,6 +219,9 @@ public class TileEntityExtraNutritionalLiquifier extends TileEntityMachine imple
     }
 
     private ResizableGasTank getOrCreateOutputTank(int process, IContentsListener listener) {
+        if (process < 0 || process >= outPutTanks.length) {
+            throw new IllegalArgumentException("Invalid process " + process);
+        }
         ResizableGasTank tank = switch (process) {
             case 0 -> outputTank1 == null ? outputTank1 = ResizableGasTank.output(MAX_GAS, getOutputTankListener(listener, process)) : outputTank1;
             case 1 -> outputTank2 == null ? outputTank2 = ResizableGasTank.output(MAX_GAS, getOutputTankListener(listener, process)) : outputTank2;
@@ -237,15 +240,16 @@ public class TileEntityExtraNutritionalLiquifier extends TileEntityMachine imple
             case 14 -> outputTank15 == null ? outputTank15 = ResizableGasTank.output(MAX_GAS, getOutputTankListener(listener, process)) : outputTank15;
             case 15 -> outputTank16 == null ? outputTank16 = ResizableGasTank.output(MAX_GAS, getOutputTankListener(listener, process)) : outputTank16;
             case 16 -> outputTank17 == null ? outputTank17 = ResizableGasTank.output(MAX_GAS, getOutputTankListener(listener, process)) : outputTank17;
-            default -> throw new IllegalArgumentException("Invalid process " + process);
+            default -> outPutTanks[process] == null
+                  ? ResizableGasTank.output(MAX_GAS, getOutputTankListener(listener, process)) : outPutTanks[process];
         };
         outPutTanks[process] = tank;
         return tank;
     }
 
     private List<IExtendedGasTank> getOutputTanks() {
-        List<IExtendedGasTank> tanks = new ArrayList<>(tier.processes);
-        for (int process = 0; process < tier.processes; process++) {
+        List<IExtendedGasTank> tanks = new ArrayList<>(getProcessCount());
+        for (int process = 0; process < getProcessCount(); process++) {
             tanks.add(outPutTanks[process]);
         }
         return tanks;
@@ -301,7 +305,7 @@ public class TileEntityExtraNutritionalLiquifier extends TileEntityMachine imple
             markSortingNotNeeded();
             sortInventory();
         }
-        for (int process = 0; process < tier.processes; process++) {
+        for (int process = 0; process < getProcessCount(); process++) {
             if (!recipeCacheLookupMonitors[process].updateAndProcess()) {
                 progress[process] = 0;
                 activeProcesses[process] = false;
@@ -354,7 +358,7 @@ public class TileEntityExtraNutritionalLiquifier extends TileEntityMachine imple
 
     @Override
     public int getSorterProcessCount() {
-        return tier.processes;
+        return getProcessCount();
     }
 
     @Override
@@ -389,7 +393,11 @@ public class TileEntityExtraNutritionalLiquifier extends TileEntityMachine imple
     }
 
     private boolean isProcessIndex(int process) {
-        return process >= 0 && process < tier.processes;
+        return process >= 0 && process < getProcessCount();
+    }
+
+    private int getProcessCount() {
+        return progress == null ? tier.getProcesses() : progress.length;
     }
 
     private boolean shouldSortInventory() {
@@ -397,7 +405,7 @@ public class TileEntityExtraNutritionalLiquifier extends TileEntityMachine imple
     }
 
     private boolean hasItemInput() {
-        for (int process = 0; process < tier.processes; process++) {
+        for (int process = 0; process < getProcessCount(); process++) {
             IInventorySlot inputSlot = getProcessInputSlot(process);
             if (inputSlot != null && !inputSlot.isEmpty()) {
                 return true;
@@ -572,7 +580,7 @@ public class TileEntityExtraNutritionalLiquifier extends TileEntityMachine imple
         if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
             sorting = dataStream.readBoolean();
             upgraded = dataStream.readBoolean();
-            for (int i = 0; i < tier.processes; i++) {
+            for (int i = 0; i < getProcessCount(); i++) {
                 progress[i] = dataStream.readInt();
             }
             for (GasTank outPutTank : outPutTanks) {
@@ -603,7 +611,7 @@ public class TileEntityExtraNutritionalLiquifier extends TileEntityMachine imple
     public void readCustomNBT(NBTTagCompound nbtTags) {
         super.readCustomNBT(nbtTags);
         sorting = nbtTags.getBoolean("sorting");
-        for (int i = 0; i < tier.processes; i++) {
+        for (int i = 0; i < getProcessCount(); i++) {
             progress[i] = nbtTags.getInteger("progress" + i);
         }
         for (int i = 0; i < outPutTanks.length; i++) {
@@ -615,7 +623,7 @@ public class TileEntityExtraNutritionalLiquifier extends TileEntityMachine imple
     public void writeCustomNBT(NBTTagCompound nbtTags) {
         super.writeCustomNBT(nbtTags);
         nbtTags.setBoolean("sorting", sorting);
-        for (int i = 0; i < tier.processes; i++) {
+        for (int i = 0; i < getProcessCount(); i++) {
             nbtTags.setInteger("progress" + i, progress[i]);
         }
         for (int i = 0; i < outPutTanks.length; i++) {

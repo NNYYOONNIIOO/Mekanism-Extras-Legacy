@@ -1,6 +1,7 @@
 package com.jerry.mekextras.common.item;
 
 import com.jerry.mekextras.api.tier.AdvancedTier;
+import com.jerry.mekextras.common.config.ExtraConfig;
 import com.jerry.mekextras.common.util.ExtraTransmitterUpgradeUtils;
 import mekanism.common.item.ItemMekanism;
 import net.minecraft.entity.player.EntityPlayer;
@@ -18,13 +19,16 @@ public class ItemAlloyRadiance extends ItemMekanism {
     @Override
     public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side,
                                            float hitX, float hitY, float hitZ, EnumHand hand) {
-        if (!ExtraTransmitterUpgradeUtils.canUpgrade(world, pos, AdvancedTier.ABSOLUTE)) {
+        String itemId = getRegistryName() == null ? null : getRegistryName().toString();
+        AdvancedTier target = ExtraConfig.getTargetForAlloy(itemId, AdvancedTier.ABSOLUTE);
+        if (target == null || !ExtraTransmitterUpgradeUtils.canUpgrade(world, pos, target)) {
             return EnumActionResult.PASS;
         }
         if (!world.isRemote && !ExtraTransmitterUpgradeUtils.tryUpgrade(
-              player, world, pos, player.getHeldItem(hand), AdvancedTier.ABSOLUTE)) {
+              player, world, pos, player.getHeldItem(hand), target)) {
             return EnumActionResult.PASS;
         }
         return EnumActionResult.SUCCESS;
     }
+
 }

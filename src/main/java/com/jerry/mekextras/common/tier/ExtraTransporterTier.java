@@ -2,6 +2,7 @@ package com.jerry.mekextras.common.tier;
 
 import com.jerry.mekextras.api.tier.AdvancedTier;
 import com.jerry.mekextras.api.tier.IAdvancedTier;
+import com.jerry.mekextras.common.config.ExtraConfig;
 import mekanism.common.tier.BaseTier;
 
 /**
@@ -12,7 +13,8 @@ public enum ExtraTransporterTier implements IAdvancedTier {
     ABSOLUTE(AdvancedTier.ABSOLUTE, 30, 4),
     SUPREME(AdvancedTier.SUPREME, 40, 8),
     COSMIC(AdvancedTier.COSMIC, 50, 16),
-    INFINITE(AdvancedTier.INFINITE, 60, 32);
+    INFINITE(AdvancedTier.INFINITE, 60, 32),
+    LUNA(AdvancedTier.LUNA, 70, 64);
 
     private final AdvancedTier advancedTier;
     private final int speed;
@@ -25,11 +27,11 @@ public enum ExtraTransporterTier implements IAdvancedTier {
     }
 
     public int getSpeed() {
-        return speed;
+        return ExtraConfig.getInt(advancedTier, "transporterSpeed", speed);
     }
 
     public int getPullAmount() {
-        return pullAmount;
+        return ExtraConfig.getInt(advancedTier, "transporterPull", pullAmount);
     }
 
     @Override

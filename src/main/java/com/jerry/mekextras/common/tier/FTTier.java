@@ -2,6 +2,7 @@ package com.jerry.mekextras.common.tier;
 
 import com.jerry.mekextras.api.tier.AdvancedTier;
 import com.jerry.mekextras.api.tier.IAdvancedTier;
+import com.jerry.mekextras.common.config.ExtraConfig;
 import mekanism.common.tier.BaseTier;
 import net.minecraft.util.IStringSerializable;
 
@@ -25,11 +26,11 @@ public enum FTTier implements IAdvancedTier, IStringSerializable {
     }
 
     public int getStorage() {
-        return storage;
+        return ExtraConfig.getInt(advancedTier, "fluidTankCapacity", storage);
     }
 
     public int getOutput() {
-        return output;
+        return ExtraConfig.getInt(advancedTier, "fluidTankOutput", output);
     }
 
     @Override

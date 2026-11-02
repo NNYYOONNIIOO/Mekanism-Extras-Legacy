@@ -2,7 +2,7 @@ package com.jerry.mekextras.common.tier;
 
 import com.jerry.mekextras.api.tier.AdvancedTier;
 import com.jerry.mekextras.api.tier.IAdvancedTier;
-import mekanism.common.ColourRGBA;
+import com.jerry.mekextras.common.config.ExtraConfig;
 import mekanism.common.tier.BaseTier;
 
 /**
@@ -13,7 +13,8 @@ public enum ExtraCableTier implements IAdvancedTier {
     ABSOLUTE(AdvancedTier.ABSOLUTE, 1_600_000),
     SUPREME(AdvancedTier.SUPREME, 8_000_000),
     COSMIC(AdvancedTier.COSMIC, 40_000_000),
-    INFINITE(AdvancedTier.INFINITE, 200_000_000);
+    INFINITE(AdvancedTier.INFINITE, 200_000_000),
+    LUNA(AdvancedTier.LUNA, 1_000_000_000);
 
     private final AdvancedTier advancedTier;
     private final int capacity;
@@ -24,11 +25,11 @@ public enum ExtraCableTier implements IAdvancedTier {
     }
 
     public int getCableCapacity() {
-        return capacity;
+        return ExtraConfig.getInt(advancedTier, "cableCapacity", capacity);
     }
 
     public int getBaseCapacity() {
-        return capacity;
+        return getCableCapacity();
     }
 
     @Override

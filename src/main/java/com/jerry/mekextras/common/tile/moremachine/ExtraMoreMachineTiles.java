@@ -38,6 +38,12 @@ public final class ExtraMoreMachineTiles {
         }
     }
 
+    public static final class CrystallizerLuna extends TileEntityExtraCrystallizer {
+        public CrystallizerLuna() {
+            super(ExtraMachineTier.LUNA);
+        }
+    }
+
     public static final class DissolutionChamberAbsolute extends TileEntityExtraDissolutionChamber {
         public DissolutionChamberAbsolute() {
             super(ExtraMachineTier.ABSOLUTE);
@@ -59,6 +65,12 @@ public final class ExtraMoreMachineTiles {
     public static final class DissolutionChamberInfinite extends TileEntityExtraDissolutionChamber {
         public DissolutionChamberInfinite() {
             super(ExtraMachineTier.INFINITE);
+        }
+    }
+
+    public static final class DissolutionChamberLuna extends TileEntityExtraDissolutionChamber {
+        public DissolutionChamberLuna() {
+            super(ExtraMachineTier.LUNA);
         }
     }
 
@@ -86,6 +98,12 @@ public final class ExtraMoreMachineTiles {
         }
     }
 
+    public static final class ChemicalOxidizerLuna extends TileEntityExtraChemicalOxidizer {
+        public ChemicalOxidizerLuna() {
+            super(ExtraMachineTier.LUNA);
+        }
+    }
+
     public static final class NutritionalLiquifierAbsolute extends TileEntityExtraNutritionalLiquifier {
         public NutritionalLiquifierAbsolute() {
             super(ExtraMachineTier.ABSOLUTE);
@@ -107,6 +125,12 @@ public final class ExtraMoreMachineTiles {
     public static final class NutritionalLiquifierInfinite extends TileEntityExtraNutritionalLiquifier {
         public NutritionalLiquifierInfinite() {
             super(ExtraMachineTier.INFINITE);
+        }
+    }
+
+    public static final class NutritionalLiquifierLuna extends TileEntityExtraNutritionalLiquifier {
+        public NutritionalLiquifierLuna() {
+            super(ExtraMachineTier.LUNA);
         }
     }
 
@@ -134,6 +158,12 @@ public final class ExtraMoreMachineTiles {
         }
     }
 
+    public static final class OrganicFarmLuna extends TileEntityExtraOrganicFarm {
+        public OrganicFarmLuna() {
+            super(ExtraMachineTier.LUNA);
+        }
+    }
+
     public static final class ChemicalWasherAbsolute extends TileEntityExtraChemicalWasher {
         public ChemicalWasherAbsolute() {
             super(ExtraMachineTier.ABSOLUTE);
@@ -155,6 +185,12 @@ public final class ExtraMoreMachineTiles {
     public static final class ChemicalWasherInfinite extends TileEntityExtraChemicalWasher {
         public ChemicalWasherInfinite() {
             super(ExtraMachineTier.INFINITE);
+        }
+    }
+
+    public static final class ChemicalWasherLuna extends TileEntityExtraChemicalWasher {
+        public ChemicalWasherLuna() {
+            super(ExtraMachineTier.LUNA);
         }
     }
 
@@ -182,6 +218,12 @@ public final class ExtraMoreMachineTiles {
         }
     }
 
+    public static final class ChemicalInfuserLuna extends TileEntityExtraChemicalInfuser {
+        public ChemicalInfuserLuna() {
+            super(ExtraMachineTier.LUNA);
+        }
+    }
+
     public static final class IsotopicCentrifugeAbsolute extends TileEntityExtraIsotopicCentrifuge {
         public IsotopicCentrifugeAbsolute() {
             super(ExtraMachineTier.ABSOLUTE);
@@ -206,6 +248,12 @@ public final class ExtraMoreMachineTiles {
         }
     }
 
+    public static final class IsotopicCentrifugeLuna extends TileEntityExtraIsotopicCentrifuge {
+        public IsotopicCentrifugeLuna() {
+            super(ExtraMachineTier.LUNA);
+        }
+    }
+
     public static TileEntity createCrystallizer(ExtraMachineTier tier) {
         switch (tier) {
             case SUPREME:
@@ -214,6 +262,8 @@ public final class ExtraMoreMachineTiles {
                 return new CrystallizerCosmic();
             case INFINITE:
                 return new CrystallizerInfinite();
+            case LUNA:
+                return new CrystallizerLuna();
             case ABSOLUTE:
             default:
                 return new CrystallizerAbsolute();
@@ -228,6 +278,8 @@ public final class ExtraMoreMachineTiles {
                 return new DissolutionChamberCosmic();
             case INFINITE:
                 return new DissolutionChamberInfinite();
+            case LUNA:
+                return new DissolutionChamberLuna();
             case ABSOLUTE:
             default:
                 return new DissolutionChamberAbsolute();
@@ -242,6 +294,8 @@ public final class ExtraMoreMachineTiles {
                 return new ChemicalOxidizerCosmic();
             case INFINITE:
                 return new ChemicalOxidizerInfinite();
+            case LUNA:
+                return new ChemicalOxidizerLuna();
             case ABSOLUTE:
             default:
                 return new ChemicalOxidizerAbsolute();
@@ -256,6 +310,8 @@ public final class ExtraMoreMachineTiles {
                 return new NutritionalLiquifierCosmic();
             case INFINITE:
                 return new NutritionalLiquifierInfinite();
+            case LUNA:
+                return new NutritionalLiquifierLuna();
             case ABSOLUTE:
             default:
                 return new NutritionalLiquifierAbsolute();
@@ -270,6 +326,8 @@ public final class ExtraMoreMachineTiles {
                 return new OrganicFarmCosmic();
             case INFINITE:
                 return new OrganicFarmInfinite();
+            case LUNA:
+                return new OrganicFarmLuna();
             case ABSOLUTE:
             default:
                 return new OrganicFarmAbsolute();
@@ -284,6 +342,8 @@ public final class ExtraMoreMachineTiles {
                 return new ChemicalWasherCosmic();
             case INFINITE:
                 return new ChemicalWasherInfinite();
+            case LUNA:
+                return new ChemicalWasherLuna();
             case ABSOLUTE:
             default:
                 return new ChemicalWasherAbsolute();
@@ -298,6 +358,8 @@ public final class ExtraMoreMachineTiles {
                 return new ChemicalInfuserCosmic();
             case INFINITE:
                 return new ChemicalInfuserInfinite();
+            case LUNA:
+                return new ChemicalInfuserLuna();
             case ABSOLUTE:
             default:
                 return new ChemicalInfuserAbsolute();
@@ -312,6 +374,8 @@ public final class ExtraMoreMachineTiles {
                 return new IsotopicCentrifugeCosmic();
             case INFINITE:
                 return new IsotopicCentrifugeInfinite();
+            case LUNA:
+                return new IsotopicCentrifugeLuna();
             case ABSOLUTE:
             default:
                 return new IsotopicCentrifugeAbsolute();

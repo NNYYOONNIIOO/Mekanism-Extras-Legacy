@@ -409,6 +409,10 @@ public class ExtraUtils {
     }
 
     public static String getTierName(AdvancedTier tier) {
+        String configured = com.jerry.mekextras.common.config.ExtraConfig.getLocalizedTierName(tier);
+        if (configured != null && !configured.isEmpty()) {
+            return configured;
+        }
         return net.minecraft.util.text.translation.I18n.translateToLocal("tier." + MekanismExtras.MODID + "." + tier.getLowerName());
     }
 

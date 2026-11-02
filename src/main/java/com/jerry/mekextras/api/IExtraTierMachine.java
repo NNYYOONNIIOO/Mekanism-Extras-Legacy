@@ -1,6 +1,7 @@
 package com.jerry.mekextras.api;
 
 import com.jerry.mekextras.api.tier.AdvancedTier;
+import com.jerry.mekextras.common.config.ExtraConfig;
 import net.minecraft.block.Block;
 
 /**
@@ -22,6 +23,6 @@ public interface IExtraTierMachine {
      * @return whether the given tier is exactly one step above this machine's current tier
      */
     default boolean canInstallExtraTier(AdvancedTier tier) {
-        return tier != null && getExtraTier() != null && tier.ordinal() == getExtraTier().ordinal() + 1;
+        return tier != null && getExtraTier() != null && ExtraConfig.isNextTier(getExtraTier(), tier);
     }
 }

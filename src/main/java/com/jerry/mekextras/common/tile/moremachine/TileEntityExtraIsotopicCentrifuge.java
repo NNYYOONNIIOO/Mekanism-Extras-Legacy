@@ -132,14 +132,14 @@ public class TileEntityExtraIsotopicCentrifuge extends TileEntityBasicMachine<Ga
 
     private ResizableGasTank getOrCreateInputTank(IContentsListener listener) {
         if (inputTank == null) {
-            inputTank = ResizableGasTank.input(MAX_GAS * tier.processes, gas -> RecipeHandler.Recipe.ISOTOPIC_CENTRIFUGE.containsRecipe(gas), getRecipeCacheListener());
+            inputTank = ResizableGasTank.input(MAX_GAS * tier.getProcesses(), gas -> RecipeHandler.Recipe.ISOTOPIC_CENTRIFUGE.containsRecipe(gas), getRecipeCacheListener());
         }
         return inputTank;
     }
 
     private ResizableGasTank getOrCreateOutputTank(IContentsListener listener) {
         if (outputTank == null) {
-            outputTank = ResizableGasTank.output(MAX_GAS * tier.processes, getRecipeCacheChangeListener(listener));
+            outputTank = ResizableGasTank.output(MAX_GAS * tier.getProcesses(), getRecipeCacheChangeListener(listener));
         }
         return outputTank;
     }
@@ -251,7 +251,7 @@ public class TileEntityExtraIsotopicCentrifuge extends TileEntityBasicMachine<Ga
 
     public int getUpgradedUsage(IsotopicRecipe recipe) {
         int possibleProcess = Math.min((int) Math.pow(2, upgradeComponent.getUpgrades(Upgrade.SPEED)), MekanismConfig.current().mekce.MAXspeedmachines.val());
-        possibleProcess *= tier.processes;
+        possibleProcess *= tier.getProcesses();
         return Math.max(possibleProcess, 1);
     }
 
@@ -269,8 +269,8 @@ public class TileEntityExtraIsotopicCentrifuge extends TileEntityBasicMachine<Ga
             ExtraMachineTier prevTier = tier;
             tier = ExtraMachineTier.byIndex(dataStream.readInt());
             sorting = dataStream.readBoolean();
-            inputTank.setMaxGas(tier.processes * MAX_GAS);
-            outputTank.setMaxGas(tier.processes * MAX_GAS);
+            inputTank.setMaxGas(tier.getProcesses() * MAX_GAS);
+            outputTank.setMaxGas(tier.getProcesses() * MAX_GAS);
             clientEnergyUsed = dataStream.readDouble();
             TileUtils.readTankData(dataStream, inputTank);
             TileUtils.readTankData(dataStream, outputTank);
@@ -299,8 +299,8 @@ public class TileEntityExtraIsotopicCentrifuge extends TileEntityBasicMachine<Ga
         securityComponent.read(nbtTags);
         tier = ExtraMachineTier.byIndex(nbtTags.getInteger("tier"));
         sorting = nbtTags.getBoolean("sorting");
-        inputTank.setMaxGas(tier.processes * MAX_GAS);
-        outputTank.setMaxGas(tier.processes * MAX_GAS);
+        inputTank.setMaxGas(tier.getProcesses() * MAX_GAS);
+        outputTank.setMaxGas(tier.getProcesses() * MAX_GAS);
         inputTank.read(nbtTags.getCompoundTag("inputTank"));
         outputTank.read(nbtTags.getCompoundTag("outputTank"));
     }
@@ -376,7 +376,7 @@ public class TileEntityExtraIsotopicCentrifuge extends TileEntityBasicMachine<Ga
     }
 
     public double getTierEnergy() {
-        return BlockStateMachine.MachineType.ISOTOPIC_CENTRIFUGE.getStorage() * tier.processes;
+        return BlockStateMachine.MachineType.ISOTOPIC_CENTRIFUGE.getStorage() * tier.getProcesses();
     }
 
         public int getBlockGuiID(Block block, int metadata) {
@@ -392,8 +392,8 @@ public class TileEntityExtraIsotopicCentrifuge extends TileEntityBasicMachine<Ga
             return false;
         }
         tier = ExtraMachineTier.ABSOLUTE;
-        inputTank.setMaxGas(tier.processes * MAX_GAS);
-        outputTank.setMaxGas(tier.processes * MAX_GAS);
+        inputTank.setMaxGas(tier.getProcesses() * MAX_GAS);
+        outputTank.setMaxGas(tier.getProcesses() * MAX_GAS);
         upgradeComponent.getSupportedTypes().forEach(this::recalculateUpgradables);
         Mekanism.packetHandler.sendUpdatePacket(this);
         markNoUpdateSync();

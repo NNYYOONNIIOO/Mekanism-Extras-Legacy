@@ -15,6 +15,9 @@ import com.jerry.mekextras.client.gui.GuiExtraOrganicFarm;
 import com.jerry.mekextras.client.gui.GuiExtraInductionMatrix;
 import com.jerry.mekextras.client.gui.GuiExtraMatrixStats;
 import com.jerry.mekextras.client.gui.GuiExtraFluidTank;
+import com.jerry.mekextras.client.model.ConfiguredBakedModel;
+import com.jerry.mekextras.client.model.ConfiguredItemLayerWrapper;
+import com.jerry.mekextras.client.resource.TierResourcePackInjector;
 import com.jerry.mekextras.client.render.item.ExtraRenderTierChemicalDissolutionChamberItem;
 import com.jerry.mekextras.client.render.item.ExtraRenderTierIsotopicCentrifugeItem;
 import com.jerry.mekextras.client.render.item.ExtraRenderTierNutritionalLiquifierItem;
@@ -68,6 +71,7 @@ import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -95,6 +99,7 @@ public class ClientProxy extends CommonProxy {
     private static final Logger LOGGER = LogManager.getLogger("MekanismExtras");
 
     public ClientProxy() {
+        TierResourcePackInjector.install();
         MinecraftForge.EVENT_BUS.register(this);
     }
 
@@ -167,7 +172,6 @@ public class ClientProxy extends CommonProxy {
             ResourceLocation name = item.getRegistryName();
             if (name != null && name.getNamespace().equals("mekanism_extras")) {
                 ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(name, "inventory"));
-
                 if (item instanceof ItemBlockExtraMachine) {
                     Block block = ((ItemBlockExtraMachine) item).getBlock();
                     String path = name.getPath();
@@ -185,17 +189,9 @@ public class ClientProxy extends CommonProxy {
                 }
             }
         }
-        // Some item blocks override their model location, make sure every block item is covered as well.
         for (Block block : ForgeRegistries.BLOCKS) {
             if (block instanceof BlockExtraTransmitter) {
                 ModelLoader.setCustomStateMapper(block, TRANSMITTER_MAPPER);
-            }
-            ResourceLocation name = block.getRegistryName();
-            if (name != null && name.getNamespace().equals("mekanism_extras")) {
-                Item item = Item.getItemFromBlock(block);
-                if (item != null) {
-                    ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(name, "inventory"));
-                }
             }
         }
     }
@@ -232,34 +228,39 @@ public class ClientProxy extends CommonProxy {
             }
             Block block = ((ItemBlockExtraMachine) item).getBlock();
             String path = name.getPath();
-            boolean customRenderer = block instanceof BlockExtraEnergyCube || block instanceof BlockExtraFluidTank ||
-                  path.endsWith("_dissolution_chamber") || path.endsWith("_nutritional_liquifier") ||
-                  path.endsWith("_isotopic_centrifuge");
-            if (!customRenderer) {
-                continue;
-            }
             ModelResourceLocation location = new ModelResourceLocation(name, "inventory");
             IBakedModel baked = registry.getObject(location);
             if (baked == null) {
                 LOGGER.warn("Missing baked inventory model for {}", location);
                 continue;
             }
-            ItemLayerWrapper wrapper = new ItemLayerWrapper(baked);
-            registry.putObject(location, wrapper);
+            AdvancedTier tier = ItemBlockExtraMachine.getTier(new ItemStack(item));
+            baked = new ConfiguredBakedModel(baked, tier);
+            registry.putObject(location, baked);
             boundModels++;
             if (block instanceof BlockExtraEnergyCube) {
+                ItemLayerWrapper wrapper = new ConfiguredItemLayerWrapper(baked);
+                registry.putObject(location, wrapper);
                 RenderExtraEnergyCubeItem.registerModel(item, wrapper);
             } else if (block instanceof BlockExtraFluidTank) {
+                ItemLayerWrapper wrapper = new ConfiguredItemLayerWrapper(baked);
+                registry.putObject(location, wrapper);
                 RenderExtraFluidTankItem.registerModel(item, wrapper);
             } else if (path.endsWith("_dissolution_chamber")) {
-                ExtraRenderTierChemicalDissolutionChamberItem.model = wrapper;
+                ItemLayerWrapper wrapper = new ConfiguredItemLayerWrapper(baked);
+                registry.putObject(location, wrapper);
+                ExtraRenderTierChemicalDissolutionChamberItem.registerModel(item, wrapper);
             } else if (path.endsWith("_nutritional_liquifier")) {
-                ExtraRenderTierNutritionalLiquifierItem.model = wrapper;
+                ItemLayerWrapper wrapper = new ConfiguredItemLayerWrapper(baked);
+                registry.putObject(location, wrapper);
+                ExtraRenderTierNutritionalLiquifierItem.registerModel(item, wrapper);
             } else if (path.endsWith("_isotopic_centrifuge")) {
-                ExtraRenderTierIsotopicCentrifugeItem.model = wrapper;
+                ItemLayerWrapper wrapper = new ConfiguredItemLayerWrapper(baked);
+                registry.putObject(location, wrapper);
+                ExtraRenderTierIsotopicCentrifugeItem.registerModel(item, wrapper);
             }
         }
-        LOGGER.info("Bound {} Mekanism Extras TESR inventory models", boundModels);
+        LOGGER.info("Bound {} Mekanism Extras configured inventory models", boundModels);
     }
 
     @Override

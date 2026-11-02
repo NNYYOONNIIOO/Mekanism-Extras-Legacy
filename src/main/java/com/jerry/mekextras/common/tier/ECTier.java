@@ -2,6 +2,7 @@ package com.jerry.mekextras.common.tier;
 
 import com.jerry.mekextras.api.tier.AdvancedTier;
 import com.jerry.mekextras.api.tier.IAdvancedTier;
+import com.jerry.mekextras.common.config.ExtraConfig;
 import mekanism.common.tier.BaseTier;
 import net.minecraft.util.IStringSerializable;
 
@@ -25,11 +26,11 @@ public enum ECTier implements IAdvancedTier, IStringSerializable {
     }
 
     public long getMaxEnergy() {
-        return maxEnergy;
+        return ExtraConfig.getLong(advancedTier, "energyCubeCapacity", maxEnergy);
     }
 
     public long getOutput() {
-        return output;
+        return ExtraConfig.getLong(advancedTier, "energyCubeOutput", output);
     }
 
     @Override

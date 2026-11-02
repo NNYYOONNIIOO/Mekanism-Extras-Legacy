@@ -21,6 +21,7 @@ public final class ExtraFactoryTiles {
             case COSMIC:
                 return MachineType.ELITE_FACTORY;
             case INFINITE:
+            case LUNA:
                 return MachineType.ULTIMATE_FACTORY;
             case ABSOLUTE:
             default:
@@ -34,6 +35,8 @@ public final class ExtraFactoryTiles {
                 return new Supreme();
             case COSMIC:
                 return new Cosmic();
+            case LUNA:
+                return new Luna();
             case INFINITE:
                 return new Infinite();
             case ABSOLUTE:
@@ -63,6 +66,12 @@ public final class ExtraFactoryTiles {
     public static final class Infinite extends TileEntityExtraFactory {
         public Infinite() {
             super(ExtraFactoryTier.INFINITE, machineType(ExtraFactoryTier.INFINITE));
+        }
+    }
+
+    public static final class Luna extends TileEntityExtraFactory {
+        public Luna() {
+            super(ExtraFactoryTier.LUNA, machineType(ExtraFactoryTier.LUNA));
         }
     }
 }

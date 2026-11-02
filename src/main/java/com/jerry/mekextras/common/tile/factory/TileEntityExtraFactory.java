@@ -230,7 +230,7 @@ public class TileEntityExtraFactory extends TileEntityMachine implements IComput
     public TileEntityExtraFactory(ExtraFactoryTier type, MachineType machine) {
         super("null", machine, 0);
         tier = type;
-        int processCount = type.processes;
+        int processCount = type.getProcesses();
         progress = new int[processCount];
         isActive = false;
         recipeCacheLookupMonitors = new FactoryRecipeCacheLookupMonitor[processCount];
@@ -566,7 +566,7 @@ public class TileEntityExtraFactory extends TileEntityMachine implements IComput
     }
 
     public int getProcessCount() {
-        return tier.processes;
+        return progress == null ? tier.getProcesses() : progress.length;
     }
 
     public ExtraFactoryTier getTier() {
@@ -843,7 +843,8 @@ public class TileEntityExtraFactory extends TileEntityMachine implements IComput
     @Nullable
     private ExtraFactoryTier getNextFactoryUpgradeTier(BaseTier upgradeTier) {
         int nextTier = tier.ordinal() + 1;
-        if (nextTier >= ExtraFactoryTier.values().length || upgradeTier.ordinal() != nextTier) {
+        if (nextTier >= ExtraFactoryTier.values().length || ExtraFactoryTier.values()[nextTier] == ExtraFactoryTier.LUNA
+              || upgradeTier.ordinal() != nextTier) {
             return null;
         }
         return ExtraFactoryTier.values()[nextTier];

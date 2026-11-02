@@ -1,10 +1,13 @@
 package com.jerry.mekextras.api.tier;
 
+import com.jerry.mekextras.common.config.ExtraConfig;
+
 public enum ExtraAlloyTier implements IAdvancedTier {
 
     THERMONUCLEAR("thermonuclear", AdvancedTier.SUPREME),
     SHINING("shining", AdvancedTier.COSMIC),
-    SPECTRUM("spectrum", AdvancedTier.INFINITE);
+    SPECTRUM("spectrum", AdvancedTier.INFINITE),
+    LUNA("luna", AdvancedTier.LUNA);
 
     public final String name;
     public final AdvancedTier advancedTier;
@@ -16,6 +19,10 @@ public enum ExtraAlloyTier implements IAdvancedTier {
 
     public String getName() {
         return name;
+    }
+
+    public String getItemId() {
+        return ExtraConfig.getAlloyItemId(advancedTier, name);
     }
 
     @Override

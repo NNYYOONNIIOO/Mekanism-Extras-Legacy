@@ -2,6 +2,7 @@ package com.jerry.mekextras.common.item;
 
 import com.jerry.mekextras.api.IExtraTierMachine;
 import com.jerry.mekextras.api.tier.AdvancedTier;
+import com.jerry.mekextras.common.config.ExtraConfig;
 import com.jerry.mekextras.common.util.ExtraUtils;
 import mekanism.common.item.ItemMekanism;
 import mekanism.common.tile.prefab.TileEntityBasicBlock;
@@ -27,7 +28,7 @@ public class ItemExtraTierInstaller extends ItemMekanism {
     private final AdvancedTier toTier;
 
     public ItemExtraTierInstaller(@Nullable AdvancedTier fromTier, AdvancedTier toTier) {
-        this.fromTier = fromTier;
+        this.fromTier = ExtraConfig.getPreviousTier(toTier);
         this.toTier = toTier;
     }
 

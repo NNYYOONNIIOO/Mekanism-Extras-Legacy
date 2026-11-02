@@ -2,6 +2,7 @@ package com.jerry.mekextras.common.tier;
 
 import com.jerry.mekextras.api.tier.AdvancedTier;
 import com.jerry.mekextras.api.tier.IAdvancedTier;
+import com.jerry.mekextras.common.config.ExtraConfig;
 import mekanism.common.ColourRGBA;
 import mekanism.common.tier.BaseTier;
 
@@ -13,7 +14,8 @@ public enum ExtraConductorTier implements IAdvancedTier {
     ABSOLUTE(AdvancedTier.ABSOLUTE, 5, 10, 500_000, new ColourRGBA(0.2, 0.2, 0.2, 1)),
     SUPREME(AdvancedTier.SUPREME, 5, 40, 2_500_000, new ColourRGBA(0.2, 0.2, 0.2, 1)),
     COSMIC(AdvancedTier.COSMIC, 5, 160, 12_500_000, new ColourRGBA(0.2, 0.2, 0.2, 1)),
-    INFINITE(AdvancedTier.INFINITE, 5, 640, 62_500_000, new ColourRGBA(0.2, 0.2, 0.2, 1));
+    INFINITE(AdvancedTier.INFINITE, 5, 640, 62_500_000, new ColourRGBA(0.2, 0.2, 0.2, 1)),
+    LUNA(AdvancedTier.LUNA, 5, 2_560, 312_500_000, new ColourRGBA(0.2, 0.2, 0.2, 1));
 
     private final AdvancedTier advancedTier;
     private final double inverseConduction;
@@ -30,11 +32,11 @@ public enum ExtraConductorTier implements IAdvancedTier {
     }
 
     public double getInverseConduction() {
-        return inverseConduction;
+        return ExtraConfig.getDouble(advancedTier, "conductorInverseConduction", inverseConduction);
     }
 
     public double getHeatCapacity() {
-        return heatCapacity;
+        return ExtraConfig.getDouble(advancedTier, "conductorHeatCapacity", heatCapacity);
     }
 
     @Deprecated
@@ -43,7 +45,7 @@ public enum ExtraConductorTier implements IAdvancedTier {
     }
 
     public double getInverseConductionInsulation() {
-        return inverseConductionInsulation;
+        return ExtraConfig.getDouble(advancedTier, "conductorInsulation", inverseConductionInsulation);
     }
 
     public ColourRGBA getBaseColour() {

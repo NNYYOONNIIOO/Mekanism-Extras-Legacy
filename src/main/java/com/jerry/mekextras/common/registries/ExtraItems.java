@@ -71,21 +71,24 @@ public class ExtraItems {
 
     //Tier installers
     public static final Item ABSOLUTE_TIER_INSTALLER = new ItemExtraTierInstaller(null, AdvancedTier.ABSOLUTE);
-    public static final Item SUPREME_TIER_INSTALLER = new ItemExtraTierInstaller(AdvancedTier.ABSOLUTE, AdvancedTier.SUPREME);
-    public static final Item COSMIC_TIER_INSTALLER = new ItemExtraTierInstaller(AdvancedTier.SUPREME, AdvancedTier.COSMIC);
-    public static final Item INFINITE_TIER_INSTALLER = new ItemExtraTierInstaller(AdvancedTier.COSMIC, AdvancedTier.INFINITE);
+    public static final Item SUPREME_TIER_INSTALLER = new ItemExtraTierInstaller(null, AdvancedTier.SUPREME);
+    public static final Item COSMIC_TIER_INSTALLER = new ItemExtraTierInstaller(null, AdvancedTier.COSMIC);
+    public static final Item INFINITE_TIER_INSTALLER = new ItemExtraTierInstaller(null, AdvancedTier.INFINITE);
+    public static final Item LUNA_TIER_INSTALLER = new ItemExtraTierInstaller(null, AdvancedTier.LUNA);
 
     //Control circuits
     public static final Item ABSOLUTE_CONTROL_CIRCUIT = circuit(AdvancedTier.ABSOLUTE);
     public static final Item SUPREME_CONTROL_CIRCUIT = circuit(AdvancedTier.SUPREME);
     public static final Item COSMIC_CONTROL_CIRCUIT = circuit(AdvancedTier.COSMIC);
     public static final Item INFINITE_CONTROL_CIRCUIT = circuit(AdvancedTier.INFINITE);
+    public static final Item LUNA_CONTROL_CIRCUIT = circuit(AdvancedTier.LUNA);
 
     //Alloys
     public static final Item RADIANCE_ALLOY = new ItemAlloyRadiance().setRarity(EnumRarity.COMMON);
     public static final Item THERMONUCLEAR_ALLOY = new ItemExtraAlloy(ExtraAlloyTier.THERMONUCLEAR, EnumRarity.UNCOMMON);
     public static final Item SHINING_ALLOY = new ItemExtraAlloy(ExtraAlloyTier.SHINING, EnumRarity.RARE);
     public static final Item SPECTRUM_ALLOY = new ItemExtraAlloy(ExtraAlloyTier.SPECTRUM, EnumRarity.EPIC);
+    public static final Item LUNA_ALLOY = new ItemExtraAlloy(ExtraAlloyTier.LUNA, EnumRarity.EPIC);
 
     //Enriched materials
     public static final Item ENRICHED_OSMIUM = new ItemMekanism();
@@ -129,16 +132,19 @@ public class ExtraItems {
         register(registry, SUPREME_TIER_INSTALLER, AdvancedTier.SUPREME.getLowerName() + "_tier_installer");
         register(registry, COSMIC_TIER_INSTALLER, AdvancedTier.COSMIC.getLowerName() + "_tier_installer");
         register(registry, INFINITE_TIER_INSTALLER, AdvancedTier.INFINITE.getLowerName() + "_tier_installer");
+        register(registry, LUNA_TIER_INSTALLER, AdvancedTier.LUNA.getLowerName() + "_tier_installer");
 
         register(registry, ABSOLUTE_CONTROL_CIRCUIT, AdvancedTier.ABSOLUTE.getLowerName() + "_control_circuit");
         register(registry, SUPREME_CONTROL_CIRCUIT, AdvancedTier.SUPREME.getLowerName() + "_control_circuit");
         register(registry, COSMIC_CONTROL_CIRCUIT, AdvancedTier.COSMIC.getLowerName() + "_control_circuit");
         register(registry, INFINITE_CONTROL_CIRCUIT, AdvancedTier.INFINITE.getLowerName() + "_control_circuit");
+        register(registry, LUNA_CONTROL_CIRCUIT, AdvancedTier.LUNA.getLowerName() + "_control_circuit");
 
-        register(registry, RADIANCE_ALLOY, "alloy_radiance");
-        register(registry, THERMONUCLEAR_ALLOY, "alloy_" + ExtraAlloyTier.THERMONUCLEAR.getName());
-        register(registry, SHINING_ALLOY, "alloy_" + ExtraAlloyTier.SHINING.getName());
-        register(registry, SPECTRUM_ALLOY, "alloy_" + ExtraAlloyTier.SPECTRUM.getName());
+        registerConfiguredAlloy(registry, RADIANCE_ALLOY, "radiance");
+        registerConfiguredAlloy(registry, THERMONUCLEAR_ALLOY, ExtraAlloyTier.THERMONUCLEAR.getName());
+        registerConfiguredAlloy(registry, SHINING_ALLOY, ExtraAlloyTier.SHINING.getName());
+        registerConfiguredAlloy(registry, SPECTRUM_ALLOY, ExtraAlloyTier.SPECTRUM.getName());
+        registerConfiguredAlloy(registry, LUNA_ALLOY, ExtraAlloyTier.LUNA.getName());
 
         register(registry, ENRICHED_OSMIUM, "enriched_osmium");
         register(registry, ENRICHED_LEAD, "enriched_lead");
@@ -168,11 +174,19 @@ public class ExtraItems {
         return item;
     }
 
+    private static void registerConfiguredAlloy(IForgeRegistry<Item> registry, Item item, String defaultName) {
+        item.setTranslationKey(MekanismExtras.MODID + ".alloy_" + defaultName);
+        item.setRegistryName(new ResourceLocation(MekanismExtras.MODID, "alloy_" + defaultName));
+        item.setCreativeTab(MekanismExtras.tabExtra);
+        registry.register(item);
+    }
+
     public static void registerOreDict() {
         OreDictionary.registerOre("alloyRadiance", RADIANCE_ALLOY);
         OreDictionary.registerOre("alloyThermonuclear", THERMONUCLEAR_ALLOY);
         OreDictionary.registerOre("alloyShining", SHINING_ALLOY);
         OreDictionary.registerOre("alloySpectrum", SPECTRUM_ALLOY);
+        OreDictionary.registerOre("alloyLuna", LUNA_ALLOY);
 
         OreDictionary.registerOre("enrichedOsmium", ENRICHED_OSMIUM);
         OreDictionary.registerOre("enrichedLead", ENRICHED_LEAD);

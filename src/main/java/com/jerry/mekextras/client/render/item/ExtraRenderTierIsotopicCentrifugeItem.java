@@ -10,12 +10,20 @@ import mekanism.common.util.MekanismUtils;
 import mekceumoremachine.client.model.machine.ModelTierIsotopicCentrifuge;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ExtraRenderTierIsotopicCentrifugeItem extends MekanismItemStackRenderer {
-    public static ItemLayerWrapper model;
+    private static final Map<Item, ItemLayerWrapper> MODELS = new HashMap<>();
     private static final ModelTierIsotopicCentrifuge CUBE = new ModelTierIsotopicCentrifuge();
+
+    public static void registerModel(Item item, ItemLayerWrapper model) {
+        MODELS.put(item, model);
+    }
 
     @Override
     protected void renderBlockSpecific(@NotNull ItemStack stack, TransformType transformType) {
@@ -40,7 +48,10 @@ public class ExtraRenderTierIsotopicCentrifugeItem extends MekanismItemStackRend
     }
 
     @Override protected void renderItemSpecific(@NotNull ItemStack stack, TransformType transformType) { }
-    @Override protected @NotNull TransformType getTransform(@NotNull ItemStack stack) { return model.getTransform(); }
+    @Override protected @NotNull TransformType getTransform(@NotNull ItemStack stack) {
+        ItemLayerWrapper model = MODELS.get(stack.getItem());
+        return model == null ? TransformType.NONE : model.getTransform();
+    }
 
     private static String tierSuffix(ExtraMachineTier tier) {
         return tier.getName();

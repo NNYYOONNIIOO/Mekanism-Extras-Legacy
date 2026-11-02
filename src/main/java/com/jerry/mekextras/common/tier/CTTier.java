@@ -2,6 +2,7 @@ package com.jerry.mekextras.common.tier;
 
 import com.jerry.mekextras.api.tier.AdvancedTier;
 import com.jerry.mekextras.api.tier.IAdvancedTier;
+import com.jerry.mekextras.common.config.ExtraConfig;
 import mekanism.common.tier.BaseTier;
 import net.minecraft.util.IStringSerializable;
 
@@ -25,11 +26,11 @@ public enum CTTier implements IAdvancedTier, IStringSerializable {
     }
 
     public long getStorage() {
-        return storage;
+        return ExtraConfig.getLong(advancedTier, "chemicalTankCapacity", storage);
     }
 
     public long getOutput() {
-        return output;
+        return ExtraConfig.getLong(advancedTier, "chemicalTankOutput", output);
     }
 
     @Override

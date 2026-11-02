@@ -95,6 +95,16 @@ dependencies {
 
 apply from: 'gradle/scripts/dependencies.gradle'
 
+tasks.named('processResources') {
+    def modVersion = project.version.toString()
+    def minecraftVersion = '1.12.2'
+    inputs.property('modVersion', modVersion)
+    inputs.property('minecraftVersion', minecraftVersion)
+    filesMatching('mcmod.info') {
+        expand(version: modVersion, mcversion: minecraftVersion)
+    }
+}
+
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
     if (propertyBool('use_modern_java_syntax')) {

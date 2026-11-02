@@ -154,7 +154,7 @@ public class TileEntityExtraChemicalWasher extends TileEntityBasicMachine<GasAnd
 
     private ResizableFluidTank getOrCreateFluidTank(IContentsListener listener) {
         if (fluidTank == null) {
-            fluidTank = ResizableFluidTank.input(MAX_FLUID * tier.processes,
+            fluidTank = ResizableFluidTank.input(MAX_FLUID * tier.getProcesses(),
                   fluid -> fluid != null && fluid.getFluid() == FluidRegistry.WATER, getRecipeCacheListener());
         }
         return fluidTank;
@@ -162,14 +162,14 @@ public class TileEntityExtraChemicalWasher extends TileEntityBasicMachine<GasAnd
 
     private ResizableGasTank getOrCreateInputTank(IContentsListener listener) {
         if (inputTank == null) {
-            inputTank = ResizableGasTank.input(MAX_GAS * tier.processes, gas -> RecipeHandler.Recipe.CHEMICAL_WASHER.containsRecipe(gas), getRecipeCacheListener());
+            inputTank = ResizableGasTank.input(MAX_GAS * tier.getProcesses(), gas -> RecipeHandler.Recipe.CHEMICAL_WASHER.containsRecipe(gas), getRecipeCacheListener());
         }
         return inputTank;
     }
 
     private ResizableGasTank getOrCreateOutputTank(IContentsListener listener) {
         if (outputTank == null) {
-            outputTank = ResizableGasTank.output(MAX_GAS * tier.processes, getRecipeCacheChangeListener(listener));
+            outputTank = ResizableGasTank.output(MAX_GAS * tier.getProcesses(), getRecipeCacheChangeListener(listener));
         }
         return outputTank;
     }
@@ -261,7 +261,7 @@ public class TileEntityExtraChemicalWasher extends TileEntityBasicMachine<GasAnd
 
     public int getUpgradedUsage() {
         int possibleProcess = Math.min((int) Math.pow(2, upgradeComponent.getUpgrades(Upgrade.SPEED)), MekanismConfig.current().mekce.MAXspeedmachines.val());
-        possibleProcess *= tier.processes;
+        possibleProcess *= tier.getProcesses();
         return Math.max(possibleProcess, 1);
     }
 
@@ -279,9 +279,9 @@ public class TileEntityExtraChemicalWasher extends TileEntityBasicMachine<GasAnd
             ExtraMachineTier prevTier = tier;
             tier = ExtraMachineTier.byIndex(dataStream.readInt());
             sorting = dataStream.readBoolean();
-            fluidTank.setCapacity(tier.processes * MAX_FLUID);
-            inputTank.setMaxGas(tier.processes * MAX_GAS);
-            outputTank.setMaxGas(tier.processes * MAX_GAS);
+            fluidTank.setCapacity(tier.getProcesses() * MAX_FLUID);
+            inputTank.setMaxGas(tier.getProcesses() * MAX_GAS);
+            outputTank.setMaxGas(tier.getProcesses() * MAX_GAS);
             clientEnergyUsed = dataStream.readDouble();
             TileUtils.readTankData(dataStream, fluidTank);
             TileUtils.readTankData(dataStream, inputTank);
@@ -308,9 +308,9 @@ public class TileEntityExtraChemicalWasher extends TileEntityBasicMachine<GasAnd
         securityComponent.read(nbtTags);
         tier = ExtraMachineTier.byIndex(nbtTags.getInteger("tier"));
         sorting = nbtTags.getBoolean("sorting");
-        fluidTank.setCapacity(tier.processes * MAX_FLUID);
-        inputTank.setMaxGas(tier.processes * MAX_GAS);
-        outputTank.setMaxGas(tier.processes * MAX_GAS);
+        fluidTank.setCapacity(tier.getProcesses() * MAX_FLUID);
+        inputTank.setMaxGas(tier.getProcesses() * MAX_GAS);
+        outputTank.setMaxGas(tier.getProcesses() * MAX_GAS);
         fluidTank.readFromNBT(nbtTags.getCompoundTag("leftTank"));
         inputTank.read(nbtTags.getCompoundTag("rightTank"));
         outputTank.read(nbtTags.getCompoundTag("centerTank"));
@@ -373,9 +373,9 @@ public class TileEntityExtraChemicalWasher extends TileEntityBasicMachine<GasAnd
             return false;
         }
         tier = ExtraMachineTier.ABSOLUTE;
-        fluidTank.setCapacity(tier.processes * MAX_FLUID);
-        inputTank.setMaxGas(tier.processes * MAX_GAS);
-        outputTank.setMaxGas(tier.processes * MAX_GAS);
+        fluidTank.setCapacity(tier.getProcesses() * MAX_FLUID);
+        inputTank.setMaxGas(tier.getProcesses() * MAX_GAS);
+        outputTank.setMaxGas(tier.getProcesses() * MAX_GAS);
         upgradeComponent.getSupportedTypes().forEach(this::recalculateUpgradables);
         Mekanism.packetHandler.sendUpdatePacket(this);
         markNoUpdateSync();
@@ -404,7 +404,7 @@ public class TileEntityExtraChemicalWasher extends TileEntityBasicMachine<GasAnd
     }
 
     public double getTierEnergy() {
-        return MachineType.CHEMICAL_WASHER.getStorage() * tier.processes;
+        return MachineType.CHEMICAL_WASHER.getStorage() * tier.getProcesses();
     }
 
     public boolean isUpgrade = true;

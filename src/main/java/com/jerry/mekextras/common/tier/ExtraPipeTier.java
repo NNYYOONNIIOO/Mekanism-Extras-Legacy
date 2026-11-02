@@ -2,6 +2,7 @@ package com.jerry.mekextras.common.tier;
 
 import com.jerry.mekextras.api.tier.AdvancedTier;
 import com.jerry.mekextras.api.tier.IAdvancedTier;
+import com.jerry.mekextras.common.config.ExtraConfig;
 import mekanism.common.tier.BaseTier;
 
 /**
@@ -12,7 +13,8 @@ public enum ExtraPipeTier implements IAdvancedTier {
     ABSOLUTE(AdvancedTier.ABSOLUTE, 256_000, 25_600),
     SUPREME(AdvancedTier.SUPREME, 1_024_000, 102_400),
     COSMIC(AdvancedTier.COSMIC, 4_096_000, 409_600),
-    INFINITE(AdvancedTier.INFINITE, 16_384_000, 1_638_400);
+    INFINITE(AdvancedTier.INFINITE, 16_384_000, 1_638_400),
+    LUNA(AdvancedTier.LUNA, 65_536_000, 6_553_600);
 
     private final AdvancedTier advancedTier;
     private final int capacity;
@@ -25,19 +27,19 @@ public enum ExtraPipeTier implements IAdvancedTier {
     }
 
     public int getPipeCapacity() {
-        return capacity;
+        return ExtraConfig.getInt(advancedTier, "mechanicalPipeCapacity", capacity);
     }
 
     public int getPipePullAmount() {
-        return pull;
+        return ExtraConfig.getInt(advancedTier, "mechanicalPipePull", pull);
     }
 
     public int getBaseCapacity() {
-        return capacity;
+        return getPipeCapacity();
     }
 
     public int getBasePull() {
-        return pull;
+        return getPipePullAmount();
     }
 
     @Override

@@ -1,8 +1,10 @@
 package com.jerry.mekextras.api.tier;
 
+import com.jerry.mekextras.common.config.ExtraConfig;
 import mekanism.api.EnumColor;
 import mekanism.common.tier.BaseTier;
 
+import java.util.Collection;
 import java.util.Locale;
 
 public enum AdvancedTier implements IAdvancedTier {
@@ -10,12 +12,9 @@ public enum AdvancedTier implements IAdvancedTier {
     ABSOLUTE("Absolute", 0xE8E983, EnumColor.BRIGHT_GREEN),
     SUPREME("Supreme", 0xE65249, EnumColor.DARK_RED),
     COSMIC("Cosmic", 0xFACEF7, EnumColor.AQUA),
-    INFINITE("Infinite", 0xDFD9AB, EnumColor.PURPLE);
+    INFINITE("Infinite", 0xDFD9AB, EnumColor.PURPLE),
+    LUNA("Luna", 0xFFFFFF, EnumColor.WHITE);
 
-    private static final int[] COSMIC_COLORS = {0xF516EF, 0xF761F2, 0xF99DF5, 0xFAC0F6, 0xFACEF7};
-    private static final int[] COSMIC_ORDER = {0, 1, 2, 3, 4, 3, 2, 1};
-    private static final int[] INFINITE_COLORS = {0xDCC0AB, 0xD6A1B8, 0xCF9FD5, 0xA9B0DC, 0xA9D5C7, 0xDFD9AB};
-    private static final int[] INFINITE_ORDER = {0, 1, 2, 3, 4, 5};
     private static final AdvancedTier[] TIERS = values();
 
     private final String name;
@@ -29,27 +28,28 @@ public enum AdvancedTier implements IAdvancedTier {
     }
 
     public String getSimpleName() {
-        return name;
+        return ExtraConfig.getTierName(this, name);
     }
 
     public String getLowerName() {
-        return name.toLowerCase(Locale.ROOT);
+        return ExtraConfig.getTierId(this, name.toLowerCase(Locale.ROOT));
     }
 
     /**
      * @return the RGB tint used for this tier's blocks, items and textures
      */
     public int getRgb() {
-        return rgb;
+        return ExtraConfig.getTierRgb(this, rgb);
     }
 
     /** Client display colour, including the configured animated Cosmic and Infinite gradients. */
     public int getDisplayColor(float ticks) {
-        if (this == COSMIC) {
-            return animate(ticks, COSMIC_COLORS, COSMIC_ORDER, 6.0F);
-        }
-        if (this == INFINITE) {
-            return animate(ticks, INFINITE_COLORS, INFINITE_ORDER, 7.0F);
+        Collection<Integer> configured = ExtraConfig.getTierPalette(this);
+        if (configured.size() > 1) {
+            int[] palette = configured.stream().mapToInt(Integer::intValue).toArray();
+            int[] order = ExtraConfig.getTierPaletteOrder(this).stream().mapToInt(Integer::intValue).toArray();
+            if (order.length < 2) return rgb;
+            return animate(ticks, palette, order, ExtraConfig.getTierFrameTicks(this, 7.0F));
         }
         return rgb;
     }
@@ -70,11 +70,11 @@ public enum AdvancedTier implements IAdvancedTier {
     }
 
     public EnumColor getColor() {
-        return color;
+        return ExtraConfig.getTierColor(this, color);
     }
 
     public boolean isObtainable() {
-        return true;
+        return ExtraConfig.isTierObtainable(this);
     }
 
     @Override
@@ -84,7 +84,7 @@ public enum AdvancedTier implements IAdvancedTier {
 
     @Override
     public BaseTier getBaseTier() {
-        return BaseTier.values()[ordinal()];
+        return this == LUNA ? BaseTier.ULTIMATE : BaseTier.values()[ordinal()];
     }
 
     public static AdvancedTier byIndex(int index) {
@@ -93,11 +93,27 @@ public enum AdvancedTier implements IAdvancedTier {
 
     public static AdvancedTier byName(String name) {
         for (AdvancedTier tier : TIERS) {
-            if (tier.getSimpleName().equalsIgnoreCase(name)) {
+            if (tier.getSimpleName().equalsIgnoreCase(name) || tier.getLowerName().equalsIgnoreCase(name)) {
                 return tier;
             }
         }
         return ABSOLUTE;
+    }
+
+    public static String getName(int ordinal) {
+        return byIndex(ordinal).getSimpleName();
+    }
+
+    public static String getLowerName(int ordinal) {
+        return byIndex(ordinal).getLowerName();
+    }
+
+    public static int getRgb(int ordinal) {
+        return byIndex(ordinal).getRgb();
+    }
+
+    public static int getDisplayColor(int ordinal, float ticks) {
+        return byIndex(ordinal).getDisplayColor(ticks);
     }
 }
 

@@ -2,6 +2,7 @@ package com.jerry.mekextras.common.util;
 
 import com.jerry.mekextras.api.tier.AdvancedTier;
 import com.jerry.mekextras.common.block.BlockExtraTransmitter;
+import com.jerry.mekextras.common.config.ExtraConfig;
 import com.jerry.mekextras.common.registries.ExtraBlocks;
 import mekanism.api.Coord4D;
 import mekanism.api.transmitters.DynamicNetwork;
@@ -135,7 +136,7 @@ public final class ExtraTransmitterUpgradeUtils {
         Block currentBlock = tile.getBlockType();
         if (currentBlock instanceof BlockExtraTransmitter) {
             AdvancedTier currentTier = ((BlockExtraTransmitter) currentBlock).getExtraTier();
-            return currentTier.ordinal() + 1 == targetTier.ordinal();
+            return ExtraConfig.isNextTier(currentTier, targetTier);
         }
         return targetTier == AdvancedTier.ABSOLUTE && transmitter.getBaseTier() == BaseTier.ULTIMATE;
     }

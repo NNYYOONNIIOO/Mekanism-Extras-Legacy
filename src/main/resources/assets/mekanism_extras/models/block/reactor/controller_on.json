@@ -1,6 +1,0 @@
-{
-  "parent": "mekanism_extras:block/reactor/controller",
-  "textures": {
-    "up": "mekanism_extras:block/naquadah_reactor_controller_on"
-  }
-}
