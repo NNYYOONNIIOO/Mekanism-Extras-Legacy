@@ -126,7 +126,7 @@ public class TileEntityExtraUniversalCable extends TileEntityTransmitter<EnergyA
         if (getMaxEnergy() - getEnergy() < 0.0001) return;
         for (EnumFacing side : EnumFacing.VALUES) {
             if (!connectionMapContainsSide(sides, side)) continue;
-            double maxDraw = Math.min(tier.getCableCapacity(), getMaxEnergy() - getEnergy());
+            double maxDraw = Math.min(getFullCapacity(), getMaxEnergy() - getEnergy());
             if (maxDraw < 0.0001) break;
             TileEntity outputter = MekanismUtils.getTileEntity(world, pos.offset(side));
             if (outputter == null) {
@@ -309,6 +309,10 @@ public class TileEntityExtraUniversalCable extends TileEntityTransmitter<EnergyA
         return tier.getCableCapacity();
     }
 
+    public double getFullCapacity() {
+        return tier.getCableCapacityAsDouble();
+    }
+
     @Override
     public double acceptEnergy(EnumFacing side, double amount, boolean simulate) {
         return amount - insertEnergyToBuffer(amount, side, Action.get(!simulate));
@@ -330,7 +334,7 @@ public class TileEntityExtraUniversalCable extends TileEntityTransmitter<EnergyA
     }
 
     public double getMaxOutput() {
-        return tier.getCableCapacity();
+        return getFullCapacity();
     }
 
     @Override
@@ -338,7 +342,7 @@ public class TileEntityExtraUniversalCable extends TileEntityTransmitter<EnergyA
         if (getTransmitter().hasTransmitterNetwork()) {
             return getTransmitter().getTransmitterNetwork().getCapacityAsDouble();
         }
-        return getCapacity();
+        return getFullCapacity();
     }
 
     @Override
@@ -397,7 +401,7 @@ public class TileEntityExtraUniversalCable extends TileEntityTransmitter<EnergyA
 
     private void setLocalBufferAmount(double energy) {
         double previous = buffer.amount;
-        buffer.setAmountClamped(energy, getCapacity());
+        buffer.setAmountClamped(energy, getFullCapacity());
         if (Double.compare(previous, buffer.amount) != 0) markChunkDirty();
     }
 

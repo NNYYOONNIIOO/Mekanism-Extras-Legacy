@@ -25,7 +25,11 @@ public enum ExtraCableTier implements IAdvancedTier {
     }
 
     public int getCableCapacity() {
-        return ExtraConfig.getInt(advancedTier, "cableCapacity", capacity);
+        return (int) Math.min(Integer.MAX_VALUE, Math.round(getCableCapacityAsDouble()));
+    }
+
+    public double getCableCapacityAsDouble() {
+        return Math.floor(ExtraConfig.getDouble(advancedTier, "cableCapacity", capacity) + 0.5D);
     }
 
     public int getBaseCapacity() {

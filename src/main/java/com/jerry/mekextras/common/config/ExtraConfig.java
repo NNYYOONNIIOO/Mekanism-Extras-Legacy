@@ -33,6 +33,7 @@ public class ExtraConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Map<AdvancedTier, TierSpec> TIER_SPECS = new EnumMap<>(AdvancedTier.class);
     private static File configDirectory;
+    private static long tierConfigRevision;
 
     public static boolean enableNaquadahOre;
     public static int naquadahSmallVeinsPerChunk;
@@ -244,9 +245,14 @@ public class ExtraConfig {
     public static boolean reloadTierConfig() {
         boolean loaded = loadTierConfig();
         if (loaded) {
+            tierConfigRevision++;
             generateResourcePack();
         }
         return loaded;
+    }
+
+    public static long getTierConfigRevision() {
+        return tierConfigRevision;
     }
 
     public static void generateResourcePack() {
@@ -459,6 +465,12 @@ public class ExtraConfig {
                         if (entry.getKey().contains("Processes") && (value < 1 || value != Math.rint(value))) {
                             throw new IllegalArgumentException("values." + entry.getKey()
                                   + " must be a positive integer");
+                        }
+                        if (value > Integer.MAX_VALUE && isIntTierValue(entry.getKey())
+                              && com.jerry.mekextras.MekanismExtras.logger != null) {
+                            com.jerry.mekextras.MekanismExtras.logger.warn(
+                                  "Tier {} values.{} exceeds the 32-bit limit; using {}", spec.id,
+                                  entry.getKey(), Integer.MAX_VALUE);
                         }
                         spec.values.put(entry.getKey(), value);
                     }
@@ -919,7 +931,25 @@ public class ExtraConfig {
     public static int getInt(AdvancedTier tier, String key, int fallback) {
         TierSpec spec = TIER_SPECS.get(tier);
         if (spec == null || !spec.values.containsKey(key)) return fallback;
-        return (int) Math.round(spec.values.get(key));
+        return (int) Math.min(Integer.MAX_VALUE, Math.round(spec.values.get(key)));
+    }
+
+    private static boolean isIntTierValue(String key) {
+        switch (key) {
+            case "mechanicalPipeCapacity":
+            case "mechanicalPipePull":
+            case "pressurizedTubeCapacity":
+            case "pressurizedTubePull":
+            case "transporterSpeed":
+            case "transporterPull":
+            case "extraFactoryProcesses":
+            case "extraMachineProcesses":
+            case "fluidTankCapacity":
+            case "fluidTankOutput":
+                return true;
+            default:
+                return false;
+        }
     }
 
     public static double getDouble(AdvancedTier tier, String key, double fallback) {

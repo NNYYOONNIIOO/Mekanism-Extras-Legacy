@@ -5,7 +5,10 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "MixinTileEntityChemicalDissolutionChamber",
-    "MixinShapedMekanismRecipe"
+    "MixinShapedMekanismRecipe",
+    "MixinDynamicNetwork",
+    "MixinBufferedNetwork",
+    "MixinEnergyNetwork"
   ],
   "injectors": {
     "defaultRequire": 1

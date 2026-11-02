@@ -98,7 +98,7 @@ public class ItemBlockExtraTransmitter extends ItemBlock implements IOverlayRend
             switch (type) {
                 case UNIVERSAL_CABLE:
                     tooltip.add(EnumColor.INDIGO + LangUtils.localize("tooltip.capacity") + ": " + EnumColor.GREY +
-                          MekanismUtils.getEnergyDisplay(ExtraCableTier.byIndex(index).getCableCapacity()) + "/t");
+                          MekanismUtils.getEnergyDisplay(ExtraCableTier.byIndex(index).getCableCapacityAsDouble()) + "/t");
                     break;
                 case MECHANICAL_PIPE:
                     tooltip.add(EnumColor.INDIGO + LangUtils.localize("tooltip.capacity") + ": " + EnumColor.GREY +

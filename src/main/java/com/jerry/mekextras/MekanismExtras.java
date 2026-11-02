@@ -49,7 +49,7 @@ public class MekanismExtras implements IModule {
 
     public static final String MODID = "mekanism_extras";
     public static final String NAME = "Mekanism Extras Legacy";
-    public static final String VERSION = "1.1.0";
+    public static final String VERSION = "1.1.1";
 
     @SidedProxy(clientSide = "com.jerry.mekextras.client.ClientProxy", serverSide = "com.jerry.mekextras.common.CommonProxy")
     public static CommonProxy proxy;
