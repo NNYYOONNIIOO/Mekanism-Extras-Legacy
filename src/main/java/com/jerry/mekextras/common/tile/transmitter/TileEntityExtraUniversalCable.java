@@ -1,5 +1,7 @@
 package com.jerry.mekextras.common.tile.transmitter;
 
+import com.jerry.mekextras.common.integration.ExtraForgeEnergyCableIntegration;
+import com.jerry.mekextras.common.integration.ExtraTeslaCableIntegration;
 import mekanism.common.block.states.BlockStateTransmitter;
 import mekanism.common.tile.transmitter.TileEntityTransmitter;
 import mekanism.api.energy.EnergyStack;
@@ -26,11 +28,9 @@ import mekanism.common.capabilities.energy.DynamicStrictEnergyHandler;
 import mekanism.common.capabilities.holder.energy.ProxiedEnergyContainerHolder;
 import mekanism.common.capabilities.resolver.manager.EnergyHandlerManager;
 import mekanism.common.integration.MekanismHooks;
-import mekanism.common.integration.forgeenergy.ForgeEnergyCableIntegration;
 import mekanism.common.integration.forgeenergy.ForgeEnergyIntegration;
 import mekanism.common.integration.ic2.IC2Integration;
 import mekanism.common.integration.redstoneflux.RFIntegration;
-import mekanism.common.integration.tesla.TeslaCableIntegration;
 import mekanism.common.integration.tesla.TeslaIntegration;
 import mekanism.common.tier.AlloyTier;
 import mekanism.common.tier.BaseTier;
@@ -67,8 +67,10 @@ public class TileEntityExtraUniversalCable extends TileEntityTransmitter<EnergyA
     private int nextTransfer = 0;
 
     public EnergyStack buffer = new EnergyStack(0);
-    private CapabilityWrapperManager teslaManager = new CapabilityWrapperManager<>(getClass(), TeslaCableIntegration.class);
-    private CapabilityWrapperManager forgeEnergyManager = new CapabilityWrapperManager<>(getClass(), ForgeEnergyCableIntegration.class);
+    private final CapabilityWrapperManager<TileEntityExtraUniversalCable, ExtraTeslaCableIntegration> teslaManager =
+          new CapabilityWrapperManager<>(TileEntityExtraUniversalCable.class, ExtraTeslaCableIntegration.class);
+    private final CapabilityWrapperManager<TileEntityExtraUniversalCable, ExtraForgeEnergyCableIntegration> forgeEnergyManager =
+          new CapabilityWrapperManager<>(TileEntityExtraUniversalCable.class, ExtraForgeEnergyCableIntegration.class);
     private final Map<EnumFacing, UniversalCableEnergyHandler> energyHandlers = new EnumMap<>(EnumFacing.class);
     private UniversalCableEnergyHandler readOnlyEnergyHandler;
     private final EnergyHandlerManager energyHandlerManager;
